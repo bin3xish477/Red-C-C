@@ -1,5 +1,5 @@
 # Botnet-Command-Control
-Send commands to all your bots.
+Send commands to all the bots in a botnet.
 
 ### Install Docker and all the dependencies for this program.
 ```bash
