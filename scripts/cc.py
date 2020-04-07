@@ -107,11 +107,11 @@ class LinuxBot:
 			Returns:
 				Will return the output of the command that was executed.
 		"""
-		DEVNULL = open(devnull, 'w')
-		output = subprocess.run(cmd,
-								shell=True, 
-								stdout=PIPE, 
-								stderr=DEVNULL)
+		DEVNULL = open(devnull, 'w')					# Open devnull file to send stderr to.
+		output = subprocess.run(cmd.split(),  			# Run command.
+								stdout=PIPE, 			# Pipe command to store in variable.
+								stderr=DEVNULL)			# Send standard error to devnull.
+								
 		return output
 
 	def handle_request(self):

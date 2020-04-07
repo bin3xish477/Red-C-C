@@ -28,10 +28,10 @@ RED = "\033[91m"
 
 class BotnetCmdCtrl:
     def __init__(self):
-        self.windows_count = 0
-        self.linux_count = 0
-        self.windows_connections = {}
-        self.linux_connections = {}
+        self.windows_count = 0				# Count for the number of Windows machines connected to our botnet.
+        self.linux_count = 0				# Count for the number of Linux machines connected to our botnet.
+        self.windows_connections = {}       # Dict containing Windows machines IP addresses and corresponding socket object.
+        self.linux_connections = {}			# Dict containing Linux machines IP addresses and corresponding socket object.
         
     def create_server_socket(self):
 		"""This function will create a single server socket will accept
@@ -74,14 +74,14 @@ class BotnetCmdCtrl:
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 def main():
-	botnetObj = BotnetCmdCtrl()
+	botnetObj = BotnetCmdCtrl()       		# Instantiating socket object.
 
 
 if __name__ == '__main__':
 	try:
 		main()
-	except KeyboardInterrupt:
+	except KeyboardInterrupt:				# Handling KeyboardInterrupt error.
 		try:
 			exit(1)
-		except SystemExit:
+		except SystemExit:					# Handling SystemExit error.
 			_exit(1)
