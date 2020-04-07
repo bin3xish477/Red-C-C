@@ -16,6 +16,7 @@ docker container run debian
 
 ### Install dependecies and modules in Linux containers
 ```bash
+for line in 
 apt install wget
 
 wget https://raw.githubusercontent.com/binexisHATT/Botnet-Command-Control/master/scripts/ss.py
