@@ -19,7 +19,7 @@ docker container run -it [Linux image e.g. ubuntu]
 
 apt install wget
 
-wget https://raw.githubusercontent.com/binexisHATT/Botnet-Command-Control/master/scripts/cc.py
+https://raw.githubusercontent.com/binexisHATT/Botnet-Command-Control/master/scripts/net/ss.py
 
 wget https://raw.githubusercontent.com/binexisHATT/Botnet-Command-Control/master/scripts/install/install.sh
 ```
@@ -27,6 +27,10 @@ wget https://raw.githubusercontent.com/binexisHATT/Botnet-Command-Control/master
 ### Download modules in Windows VM
 ```powershell
 Use powershell for this!!
+```
+
+### Show how to initiate Command & Control server.
+```bash
 ```
 
 ### Showcase some of our cool Python functions here!
