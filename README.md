@@ -4,9 +4,12 @@ Send commands to all your bots.
 ### Testing with Linux Docker containers and Windows VM
 
 ```
+# Download the latest Linux images of the following distros.
 docker pull ubuntu
 docker pull alpine
 docker pull debian
+
+# Run all the Linux containers.
 docker container run ubuntu
 docker container run alpine
 docker container run debian
