@@ -11,7 +11,7 @@ chmod +x install.sh
 
 ./install.sh
 ```
-### Downloading botnet scripts in Docker containers.
+### Download botnet scripts in Docker containers.
 ##### Repeat this step for all the containers you wish to control.
 ```bash
 # Get interactive shell for container.
