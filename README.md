@@ -2,7 +2,6 @@
 Send commands to all your bots.
 
 ### Testing with Linux Docker containers and Windows VM
-
 ```docker
 # Download the latest Linux images of the following distros.
 docker pull ubuntu
