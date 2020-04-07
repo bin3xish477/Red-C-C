@@ -28,3 +28,7 @@ wget https://raw.githubusercontent.com/binexisHATT/Botnet-Command-Control/master
 ```powershell
 Use powershell for this!!
 ```
+
+### Showcase some of our cool Python functions here!
+```python
+```
