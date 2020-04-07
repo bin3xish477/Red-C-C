@@ -15,7 +15,7 @@ chmod +x install.sh
 ##### Repeat this step for all the containers you wish to control.
 ```bash
 # Get interactive shell for container.
-docker container run -it [Linux image]
+docker container run -it [Linux image e.g. ubuntu]
 
 apt install wget
 
