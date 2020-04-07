@@ -3,7 +3,7 @@ Send commands to all your bots.
 
 ### Testing with Linux Docker containers and Windows VM
 
-```
+```docker
 # Download the latest Linux images of the following distros.
 docker pull ubuntu
 docker pull alpine
@@ -16,7 +16,7 @@ docker container run debian
 ```
 
 ### Install dependecies and modules in Linux containers
-```
+```bash
 apt install wget
 
 wget https://raw.githubusercontent.com/binexisHATT/Botnet-Command-Control/master/scripts/ss.py
