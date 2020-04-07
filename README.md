@@ -21,3 +21,7 @@ wget https://raw.githubusercontent.com/binexisHATT/Botnet-Command-Control/master
 wget https://raw.githubusercontent.com/binexisHATT/Botnet-Command-Control/master/scripts/install.sh
 ```
 
+## Download modules in Windows VM
+```
+Will use powershell for this!!
+```
