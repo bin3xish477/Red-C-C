@@ -43,6 +43,7 @@ def create_client_socket():
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_sock: # Initializing socket.
 		ip_port = (IP, PORT) # Tuple containing IP address and port number.
 		client_sock.connect(ip_port) # Connecting to server.
+		print("Connected")
 		initial_message = "OS=" + system() # Send IP address and OS information.
 		client_sock.send(initial_message.encode()) # Send message with this host's IP back to the server.
 		return client_sock # Return the created client socket.
