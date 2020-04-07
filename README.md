@@ -1,27 +1,38 @@
 # Botnet-Command-Control
-Send commands to all your bots.
+Send commands to all the bots in a botnet.
 
-### Testing with Linux Docker containers and Windows VM
+### Install Docker and all the dependencies for this program.
+```bash
+git clone https://github.com/binexisHATT/Botnet-Command-Control.git
 
-```
-docker pull ubuntu
-docker pull alpine
-docker pull debian
-docker container run ubuntu
-docker container run alpine
-docker container run debian
-```
+cd /Botnet-Command-Control/scripts/docker
 
-### Install dependecies and modules in Linux containers
+chmod +x install.sh
+
+./install.sh
 ```
+### Download botnet scripts in Docker containers.
+##### Repeat this step for all the containers you wish to control.
+```bash
+# Get interactive shell for container.
+docker container run -it [Linux image e.g. ubuntu]
+
 apt install wget
 
-wget https://raw.githubusercontent.com/binexisHATT/Botnet-Command-Control/master/scripts/ss.py
+https://raw.githubusercontent.com/binexisHATT/Botnet-Command-Control/master/scripts/net/ss.py
 
-wget https://raw.githubusercontent.com/binexisHATT/Botnet-Command-Control/master/scripts/install.sh
+wget https://raw.githubusercontent.com/binexisHATT/Botnet-Command-Control/master/scripts/install/install.sh
 ```
 
 ### Download modules in Windows VM
+```powershell
+Use powershell for this!!
 ```
-Will use powershell for this!!
+
+### Show how to initiate Command & Control server.
+```bash
+```
+
+### Showcase some of our cool Python functions here!
+```python
 ```
