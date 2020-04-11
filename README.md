@@ -46,7 +46,7 @@ def keylogger():
 	except OSError:
 		pass
 ```
-### Built-in Rasonware Operations.
+### Built-in Rasonware Operations
 ```python
 def crypto(action, *request):
 	key_copy = ''
