@@ -1,4 +1,4 @@
-# Botnet-Command-Control
+# Red C&C
 Explain what our program here!!!
 
 
