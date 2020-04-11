@@ -561,5 +561,5 @@ if __name__ == '__main__':
 	except KeyboardInterrupt: # Handling KeyboardInterrupt error.
 		print(RED, '\nExiting program...', RESET)
 		server.close()
-		sleep(0.50)
+		sleep(0.25)
 		run(['reset'])
