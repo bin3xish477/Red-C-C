@@ -74,4 +74,8 @@ def crypto(action, *request):
 				plain_text = cipher.decrypt(data)
 				ouf.write(plain_text)
 		return r'File Decrypted...'
+	if action == 'encrypt':
+		return encrypt_it()
+	else:
+		return decrypt_it()
 ```
