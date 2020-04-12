@@ -82,11 +82,11 @@ def self_delete():
 			Delete all copies of this file from the Windows file
 			system.
 			'''
-			if os.path.isfile('%temp%\\' + FILENAME):
+			if os.path.isfile(r'%temp%\\' + FILENAME):
 				run([r'del %temp%\\' + FILENAME], shell=True) # Attempt to remove files from Windows file system.
-			if os.path.isfile('C:\Users\%username%\\' + FILENAME):
+			if os.path.isfile(r'C:\Users\%username%\\' + FILENAME):
 				run([r'del C:\Users\%username%\\' + FILENAME], shell=True) # ^
-			if os.path.isfile('C:\Users\%username%\AppData\\' + FILENAME):
+			if os.path.isfile(r'C:\Users\%username%\AppData\\' + FILENAME):
 				run([r'del C:\Users\%username%\AppData\\' + FILENAME], shell=True) # ^
 			if os.path.isfile(fullpath):
 				run(r'del' + fullpath, shell=True) # ^
