@@ -11,7 +11,7 @@ A powershell or .bat script would only work under very specific conditions so we
 2. Install the pip package manager for Python to download additional modules that don't come pre-installed. This is a great guide on doing so for Windows: https://www.liquidweb.com/kb/install-pip-windows/. 
 
 3. Once pip is installed, run the following two commands in the command line to download the additional modules needed to run cc.py:
-```
+```python
 pip install pynput
 pip install cryptography
 ```
