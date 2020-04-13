@@ -232,7 +232,7 @@ def crypto(action: str, *args):
 			f.seek(0)
 			f.write(cipher_text)
 			f.truncate()
-			return f'  Save the decryption key -> {key.decode()}'
+			return f'  Save this key -> {key.decode()}'
 	else:
 		to_encrypt, key = args[0][0], args[0][1]
 		with open(to_encrypt, 'wb+') as f:
