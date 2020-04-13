@@ -27,12 +27,12 @@ cd Red-C-C/
 ----------------------------------
 Or you can create a symbolic link:
 
-path = the path to the folder you cloned Red C&C in.
+path = The path to the folder you cloned Red C&C in.
 ln path/Red-C-C/scripts/net/ss.py /bin/redcc
 
 With this symbolic link, typing "redcc" will execute the handler anywhere in the command line.
 
-# Running the handler.
+# Running the handler with symbolic link.
 redcc
 ```
 
