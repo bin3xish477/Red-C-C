@@ -36,7 +36,8 @@ With this symbolic link, typing "redcc" will execute the handler anywhere in the
 redcc
 ```
 ### Remember to change the IP address in both ss.py and cc.py to your IP address!
-`IP = "Your IP address goes here!"`
+`IP = "Your IP address"`
+
 # Some of Red C&C's Highlights
 ### Built-in Keylogger
 ```python
