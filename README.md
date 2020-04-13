@@ -1,17 +1,26 @@
 # Red C&C
-__ is a program focused on commanding and controlling a botnet. consist of two scripts: one that will be executed by the attacker and one that will be downloaded and executed on the targeted machines. __ will allow an attacker to send terminal commands to an entire botnet through a single interface and a single command. The purpose of __ is to simplify the communication between an attacker and the machines that they have compromised. 
+Red C&C is a program focused on commanding and controlling a botnet. consist of two scripts: one that will be executed by the attacker and one that will be downloaded and executed on the targeted machines. Red C&C will allow an attacker to send terminal commands to an entire botnet through a single interface and a single command. The purpose of Red C&C is to simplify the communication between an attacker and the machines that they have compromised. 
 
-
-### Starting the Handler
+### Installing Red C&C
 You can create a symbolic link that will work like a command by running the following:
-
-ln [PATH to ss.py] /bin/redcc
-
-For example:
 ```
-ln ~/Red-C-C/scripts/net/ss.py /bin/redcc
+# Install Git if its not installed already.
+apt install git
+
+# Clone this repository to a folder of your choosing.
+git clone https://github.com/binexisHATT/Red-C-C.git
+
+# Change directory into the programs folder.
+cd Red-C-C/
+
+# Running the handler.
+./ss.py
+
+You can create a symbolic link that will work like a command by running the following:
+path = the path of the folder you cloned Red C&C in.
+ln [path]/Red-C-C/scripts/net/ss.py /bin/redcc
+With this symbolic link, typing "redcc" will execute the handler anywhere in the command line.
 ```
-This will result in being able to run the server program from anywhere by simply typing "redcc" on the command line. 
 
 
 ## Some of Red C&C's Highlights
