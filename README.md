@@ -11,7 +11,6 @@ Red C&C is a program focused on commanding and controlling a botnet. Red C&C con
 #### **Note**: Red C&C was created as a PoC and should not be used for malicious intent but for educational purposes.
 
 ### Installing Red C&C
-#### Remember to change the IP address in both ss.py and cc.py to your IP address!
 ```
 # Install Git if its not installed.
 apt install git
@@ -36,7 +35,7 @@ With this symbolic link, typing "redcc" will execute the handler anywhere in the
 # Running the handler with symbolic link.
 redcc
 ```
-
+### Remember to change the IP address in both ss.py and cc.py to your IP address!
 
 # Some of Red C&C's Highlights
 ### Built-in Keylogger
