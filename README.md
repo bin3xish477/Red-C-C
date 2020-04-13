@@ -16,7 +16,7 @@ cd Red-C-C/
 # Running the handler.
 ./ss.py
 
--------------------------------------------------------------------------------------------------------
+----------------------------------
 or you can create a symbolic link:
 
 path = the path of the folder you cloned Red C&C in.
