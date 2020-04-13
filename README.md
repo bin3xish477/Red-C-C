@@ -1,8 +1,9 @@
 # Red C&C
-Explain what our program here!!!
+__ is a program focused on commanding and controlling a botnet. consist of two scripts: one that will be executed by the attacker and one that will be downloaded and executed on the targeted machines. __ will allow an attacker to send terminal commands to an entire botnet through a single interface and a single command. The purpose of __ is to simplify the communication between an attacker and the machines that they have compromised. 
 
 
-### Show how to initiate Command
+### Starting the Handler
+Running Red C&C is as simple as 
 ```bash
 
 ```
