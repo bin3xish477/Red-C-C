@@ -2,6 +2,8 @@
 
 Red C&C has some dependencies that need to be installed prior to running it. The install.sh bash script located in this folder should help by running it on any Linux machine you're looking to issue commands to and run the client-side program (cc.py). If it utilizes a distribution not contained in the script, you can simply run the appropriate commands for your distribution located within the If/Then statements right in the terminal and it should allow you to obtain everything necessary to run cc.py on the target machine.
 
+**For the best experience in testing, have a couple of virtual machines set up that you can uses as your "clients" or targets and one as your "server" or attacker.**
+
 # Windows Instructions
 
 A powershell or .bat script would only work under very specific conditions so we've listed some instructions on how to install everything so our project will work on a Windows machine as well. 
