@@ -13,7 +13,7 @@ Red C&C is a program focused on commanding and controlling a botnet. Red C&C con
 ### Installing Red C&C
 You can create a symbolic link that will work like a command by running the following:
 ```
-# Install Git if its not installed already.
+# Install Git if its not installed.
 apt install git
 
 # Clone this repository to a folder of your choosing.
