@@ -37,7 +37,7 @@ redcc
 ```
 
 
-## Some of Red C&C's Highlights
+# Some of Red C&C's Highlights
 ### Built-in Keylogger
 ```python
 def on_press(key):
