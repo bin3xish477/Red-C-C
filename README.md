@@ -11,7 +11,6 @@ Red C&C is a program focused on commanding and controlling a botnet. Red C&C con
 #### **Note**: Red C&C was created as a PoC and should not be used for malicious intent but for educational purposes.
 
 ### Installing Red C&C
-You can create a symbolic link that will work like a command by running the following:
 ```
 # Install Git if its not installed.
 apt install git
