@@ -13,7 +13,7 @@ For example:
 ```
 ln ~/Red-C-C/scripts/net/ss.py /bin/redcc
 ```
-This will result in being able to run the program from anywhere by simply typing "redcc" on the command line. 
+This will result in being able to run the server program from anywhere by simply typing "redcc" on the command line. 
 
 
 ## Some of Red C&C's Highlights
