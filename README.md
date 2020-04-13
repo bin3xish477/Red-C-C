@@ -3,8 +3,10 @@ __ is a program focused on commanding and controlling a botnet. consist of two s
 
 
 ### Starting the Handler
-You can create a symbolic link that will work like a command by running the following
+You can create a symbolic link that will work like a command by running the following:
+
 ln [PATH to ss.py] /bin/redcc
+
 For example:
 ```
 ln ~/Red-C-C/scripts/net/ss.py /bin/redcc
