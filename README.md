@@ -7,6 +7,14 @@ Running Red C&C is as simple as
 ```bash
 
 ```
+You can create a symbolic link that will work like a command by running the following command
+ln [PATH to ss.py] /bin/redcc
+For example:
+```
+ln ~/Red-C-C/scripts/net/ss.py /bin/redcc
+```
+This will result in being able to run the program from anywhere by simply typing "redcc" on the command line. 
+
 
 ## Some of Red C&C's Highlights
 ### Built-in Keylogger
