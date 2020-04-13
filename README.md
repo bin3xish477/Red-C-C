@@ -1,10 +1,10 @@
 ```
-██████╗ ███████╗██████╗  ██████╗   ██╗    ██████╗
-██╔══██╗██╔════╝██╔══██╗██╔════╝   ██║   ██╔════╝
-██████╔╝█████╗  ██║  ██║██║     ████████╗██║     
-██╔══██╗██╔══╝  ██║  ██║██║     ██╔═██╔═╝██║     
-██║  ██║███████╗██████╔╝╚██████╗██████║  ╚██████╗
-╚═╝  ╚═╝╚══════╝╚═════╝  ╚═════╝╚═════╝   ╚═════╝
+				██████╗ ███████╗██████╗  	██████╗   ██╗    ██████╗
+				██╔══██╗██╔════╝██╔══██╗	██╔════╝   ██║   ██╔════╝
+				██████╔╝█████╗  ██║  ██║	██║     ████████╗██║     
+				██╔══██╗██╔══╝  ██║  ██║	██║     ██╔═██╔═╝██║     
+				██║  ██║███████╗██████╔╝	╚██████╗██████║  ╚██████╗
+				╚═╝  ╚═╝╚══════╝╚═════╝  	╚═════╝╚═════╝   ╚═════╝
 ```                                            
 # Red C&C
 Red C&C is a program focused on commanding and controlling a botnet. Red C&C consists of two scripts: one that will be executed by the attacker and one that will be downloaded and executed on the targeted machines. Red C&C will allow an attacker to send terminal commands to an entire botnet through a single interface using a single command. The purpose of Red C&C is to simplify the communication between an attacker and the machines that they have compromised. Red C&C uses two of Python's Built-in modules for most of the heavy lifting: the **Socket** module for establishing a client-server structure between the attacker and the target machines, and the **Threading** module for dividing the two main functions of the program into two seperate threads. 
