@@ -25,7 +25,7 @@ except ImportError as err:
 
 #  CONSTANTS   #
 PORT = 1337 # Port number to receve connections from.
-IP = "192.168.31.131" # IP address of your computer. Change this!
+IP = "127.0.0.1" # IP address of your computer. Change this!
 TO_ACCEPT = 10 # Number of connections to accept.
 NUM_OF_THREADS = 2 # Number of threads that we will create.
 THREAD_IDS = [1, 2] # Thread identifiers.
