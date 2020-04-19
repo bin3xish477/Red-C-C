@@ -120,4 +120,4 @@ def crypto(action: str, *args):
 			return '  [+] File successfully decrypted!'
 ```
 
-### Project Video --> https://www.youtube.com/watch?v=oUrBTU-7KGc&list=PLx0iOsdUOUmm0Z9vWB5iIGAMZpiRIGA0z&index=3
+### Project Video --> [redcc](https://www.youtube.com/watch?v=oUrBTU-7KGc&list=PLx0iOsdUOUmm0Z9vWB5iIGAMZpiRIGA0z&index=3)
